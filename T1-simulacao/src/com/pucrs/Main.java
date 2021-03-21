@@ -6,19 +6,19 @@ public class Main {
         /**
          * c = é uma constante usada para maior variação
          * dos números gerados
-         *
-         *
+         * a = um número
+         * mod = um número grande
          */
-        geraPseudoAleatorio(23, 0, 1, 0.12232);
+        geraPseudoAleatorio(54564, 234, Math.pow(2,39), 7);
     }
 
-    public static void geraPseudoAleatorio(int a, double c, int mod, double semente){
-        int size = 1000;
+    public static void geraPseudoAleatorio(int a, double c, double mod, double semente){
+        int size = 1001;
         double[] x = new double[size];
         x[0] = semente;
         System.out.println(x[0]);
         for(int i = 1; i<size; i++){
-            x[i] = (a*x[i-1] + c) % mod;
+            x[i] = ((a*x[i-1] + c) % mod);
             System.out.println(x[i]);
         }
 
