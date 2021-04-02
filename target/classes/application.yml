@@ -1,0 +1,12 @@
+numeros-aleatorios: 12345
+
+filas:
+  -
+    capacidade: 3
+    chegada-inicial: 2.0
+    chegada-maxima: 2.0
+    chegada-minima: 1.0
+    saida-maxima: 6.0
+    saida-minima: 3.0
+    servidores: 1
+
