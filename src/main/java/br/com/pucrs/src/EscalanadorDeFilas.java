@@ -1,5 +1,6 @@
 package br.com.pucrs.src;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class EscalanadorDeFilas {
@@ -11,5 +12,10 @@ public class EscalanadorDeFilas {
     public List<Controle> controles;
     
     public List<Fila> filas;
+
+    public EscalanadorDeFilas(){
+        filas = new ArrayList<Fila>();
+        filas.add(new Fila());
+    }
 
 }

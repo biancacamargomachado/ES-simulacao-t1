@@ -25,7 +25,7 @@ public class Simulador {
         final List<HashMap<String, Object>> dadosFilas = (List<HashMap<String, Object>>) dados.get("filas");
 
         /**
-         * Mapeai do yaml para um object Fila a representação dos dados contidos no arquivo
+         * Mapeia do yaml para um object Fila a representação dos dados contidos no arquivo
          */
         List<Fila> filas = dadosFilas.stream().map(fila -> {
             Fila novaFila = new Fila();
@@ -39,7 +39,7 @@ public class Simulador {
             return novaFila;
         }).collect(Collectors.toList());
 
-        escalanadorDeFilas .filas.addAll(filas); // adiciona todas as filas no escalonador.
+        escalanadorDeFilas.filas.addAll(filas); // adiciona todas as filas no escalonador.
 
         System.out.println("break point");
     }
