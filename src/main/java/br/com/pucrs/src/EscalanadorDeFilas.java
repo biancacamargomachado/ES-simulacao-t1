@@ -17,5 +17,4 @@ public class EscalanadorDeFilas {
         filas = new ArrayList<Fila>();
         filas.add(new Fila());
     }
-
 }
