@@ -6,7 +6,7 @@ import java.util.List;
 public class EscalanadorDeFilas {
 
     /**
-     * Sempre que add um elemento nessa lista executar o comando abaixo
+     * Sempre que  add um elemento nessa listaexecutar o comando abaixo
      * controles.sort(Comparator.comparing(Controle::getTime));
      */
     public List<Controle> controles;

@@ -1,7 +1,9 @@
 package br.com.pucrs.src;
 
+import java.util.Comparator;
+
 public class Evento {
-    public TipoEnum tipo; // 0 = chegada e 1 saída;
+    public TipoEnum tipo;
     public double tempo; // tempo do evento
 
     public Evento(TipoEnum tipo, double tempo){
@@ -12,5 +14,9 @@ public class Evento {
     public enum TipoEnum {
         ENTRADA, SAIDA;
     }
+
+    public double getTime() {
+        return this.tempo;
+    };
 
 }

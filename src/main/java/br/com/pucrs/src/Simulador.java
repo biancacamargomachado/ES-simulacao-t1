@@ -1,9 +1,6 @@
 package br.com.pucrs.src;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Simulador {
@@ -53,8 +50,10 @@ public class Simulador {
                 }
             }
 
-            if (i < this.qtdNumerosAleatorios)
+            if (i < this.qtdNumerosAleatorios && eventoAtual.tipo != Evento.TipoEnum.SAIDA) {
                 agendaChegada(aleatorio.numerosAleatorios[i], filaAtual);
+                i++;
+            }
         }
     };
 
@@ -96,10 +95,12 @@ public class Simulador {
         // t = ((B-A) * aleatorio + A)
         double tempoSaida = (filaAtual.saidaMaxima -  filaAtual.saidaMinima) * aleatorio + filaAtual.saidaMinima;
         // t + tempo atual
+        // TODO: conferir se esse tempo tá certo
         double tempoRealSaida = tempoSaida + tempo;
 
         Evento novaSaida = new Evento(Evento.TipoEnum.SAIDA, tempoRealSaida);
-        eventosAgendados.add(novaSaida); // TODO: método para ordenar por tempo ao agendar -> menor tempo antes
+        eventosAgendados.add(novaSaida);
+        eventosAgendados.sort(Comparator.comparingDouble(event -> event.tempo));
         System.out.println("AGENDADO |" + novaSaida.tipo + " | " + tempoRealSaida);
     }
 
@@ -110,7 +111,8 @@ public class Simulador {
         double tempoRealChegada = tempoChegada + tempo;
 
         Evento novaChegada = new Evento(Evento.TipoEnum.ENTRADA, tempoRealChegada);
-        eventosAgendados.add(novaChegada); // TODO: método para ordenar por tempo ao agendar -> menor tempo antes
+        eventosAgendados.add(novaChegada);
+        eventosAgendados.sort(Comparator.comparingDouble(event -> event.tempo));
         System.out.println("AGENDADO |" + novaChegada.tipo + " | " + tempoRealChegada);
     }
 }

@@ -23,6 +23,15 @@ public class Aleatorio {
         this.size = size;
     };
 
+    public Aleatorio(int size, double[] numerosAleatorios) {
+        this.a = 54564;
+        this.c = 31;
+        this.mod = Math.pow(2,39)-5;
+        this.semente = 7;
+        this.size = size;
+        this.numerosAleatorios = numerosAleatorios;
+    };
+
     public double[] geraPseudoAleatorio(){
         numerosAleatorios = new double[size];
         numerosAleatorios[0] = semente;
