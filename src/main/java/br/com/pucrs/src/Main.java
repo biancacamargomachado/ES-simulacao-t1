@@ -10,10 +10,12 @@ public class Main {
         Simulador simulador = new Simulador();
         simulador.mapearYamlParaPOJO();
 
-        Aleatorio aleatorios = new Aleatorio(simulador.qtdNumerosAleatorios);
-        aleatorios.geraPseudoAleatorio();
+        //Aleatorio aleatorios = new Aleatorio(simulador.qtdNumerosAleatorios);
+        Aleatorio aleatorios = new Aleatorio(7);
 
-        simulador.simulacao(aleatorios);
+        aleatorios.geraPseudoAleatorioTeste();
+
+        simulador.executar();
 
     }
 }

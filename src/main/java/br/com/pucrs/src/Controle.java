@@ -6,14 +6,19 @@ package br.com.pucrs.src;
  */
 public class Controle {
 
-    public double time;
+    public double tempo;
     public ControleEnum controleEnum;
 
-    public double getTime() {
-        return time;
+    public Controle(ControleEnum controleEnum, double tempo) {
+        this.controleEnum = controleEnum;
+        this.tempo = tempo;
+    }
+
+    public double getTempo() {
+        return tempo;
     }
 
     enum ControleEnum {
-        ENTRADA, SAIDA;
+        CHEGADA, SAIDA;
     }
 }

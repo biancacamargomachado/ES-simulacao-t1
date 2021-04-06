@@ -1,6 +1,6 @@
 package br.com.pucrs.src;
 
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,52 +11,29 @@ public class Simulador {
     public final String ARQUIVO_YML = "application.yml";
 
     public int qtdNumerosAleatorios;
-    public EscalanadorDeFilas escalanadorDeFilas;
-    public List<Evento> eventosAcontecendo = new ArrayList<Evento>();
-    public List<Evento> eventosAgendados = new ArrayList<Evento>(); // manter esta lista ordenada por menor tmepo de evento
+    public EscalanadorDeFilas escalanadorDeFilas =  new EscalanadorDeFilas();
     public double tempo;
 
-    public Simulador() {
-        this.escalanadorDeFilas = new EscalanadorDeFilas();
-    }
-
-    public void simulacao (Aleatorio aleatorio) {
+    public void executar() {
         int i = 0;
-        while(i < this.qtdNumerosAleatorios) {
-            Evento eventoAtual = eventosAgendados.get(0); // pega o próximo evento a ocorrer
-            eventosAgendados.remove(0); // remove o evento dos agendados, está sendo executado
-            eventosAcontecendo.add(eventoAtual); // adiciona no evento que está acontecendo
-            tempo = eventoAtual.tempo;
+        while (i < this.qtdNumerosAleatorios) {
+            Controle controle = this.escalanadorDeFilas.agendamentos.remove(0); // pega o próximo evento a ocorrer
+            tempo = controle.tempo;
 
-            Fila filaAtual = escalanadorDeFilas.filas.get(0);
+            Fila fila = escalanadorDeFilas.filas.get(0);
 
-            if (eventoAtual.tipo == Evento.TipoEnum.ENTRADA) {
-                // se ainda tempo espaço na fila
-                if (filaAtual.populacaoAtual <= filaAtual.capacidade) {
-                    filaAtual.populacaoAtual++;
-                    // se só tem uma pessoa na fila ou nenhuma -> já é atendido
-                    if (filaAtual.populacaoAtual <= 1) {
-                        System.out.println("EXECUTADO |" + eventoAtual.tipo + " | " + eventoAtual.tempo);
-                        agendaSaida(aleatorio.numerosAleatorios[i], filaAtual);
-                        i++; // usou um aleatório, passa pro próximo
-                    }
-                } else {
-                    // não conseguiu entrar na fila, pois estava cheia
-                    filaAtual.perdidos++;
-                }
-            } else if (eventoAtual.tipo == Evento.TipoEnum.SAIDA) {
-                filaAtual.populacaoAtual--;
-                System.out.println("EXECUTADO |" + eventoAtual.tipo + " | " + eventoAtual.tempo);
-                if (filaAtual.populacaoAtual >= 1) { // tem gente na espera pra ficar de frente pro servidor?
-                    agendaSaida(aleatorio.numerosAleatorios[i], filaAtual);
-                    i++; // usou um aleatório, passa pro próximo
-                }
+            if (controle.controleEnum == Controle.ControleEnum.CHEGADA) {
+                fila.chegada();
+            }
+
+            if (controle.controleEnum == Controle.ControleEnum.SAIDA) {
+                fila.chegada();
             }
 
             if (i < this.qtdNumerosAleatorios)
-                agendaChegada(aleatorio.numerosAleatorios[i], filaAtual);
+                this.escalanadorDeFilas.agendamentoChegada(fila);
         }
-    };
+    }
 
     public void mapearYamlParaPOJO() {
 
@@ -78,29 +55,16 @@ public class Simulador {
             novaFila.saidaMaxima = (double) fila.get("saida-maxima");
             novaFila.saidaMinima = (double) fila.get("saida-minima");
             novaFila.servidores = (int) fila.get("servidores");
+            novaFila.probabilidade = new double[novaFila.capacidade];
+            novaFila.escalonador = escalanadorDeFilas;
             return novaFila;
         }).collect(Collectors.toList());
 
-        System.out.println("EVENTO   |" + "tipo    |" +  " tempo");
-        // agendada a chegada
-        escalanadorDeFilas.filas.addAll(filas); // adiciona todas as filas no escalonador.
-        escalanadorDeFilas.filas.remove(0); // remove o primeiro item que é vazio
-
-        // agenda primeiro evento
-        Evento primeiroEvento = new Evento(Evento.TipoEnum.ENTRADA, escalanadorDeFilas.filas.get(0).chegadaInicial);
-        eventosAgendados.add(primeiroEvento);
-        System.out.println("AGENDADO |" + primeiroEvento.tipo + " | " + primeiroEvento.tempo);
-    }
-
-    public void agendaSaida(double aleatorio, Fila filaAtual) {
-        // t = ((B-A) * aleatorio + A)
-        double tempoSaida = (filaAtual.saidaMaxima -  filaAtual.saidaMinima) * aleatorio + filaAtual.saidaMinima;
-        // t + tempo atual
-        double tempoRealSaida = tempoSaida + tempo;
-
-        Evento novaSaida = new Evento(Evento.TipoEnum.SAIDA, tempoRealSaida);
-        eventosAgendados.add(novaSaida); // TODO: método para ordenar por tempo ao agendar -> menor tempo antes
-        System.out.println("AGENDADO |" + novaSaida.tipo + " | " + tempoRealSaida);
+        this.escalanadorDeFilas.filas.addAll(filas); // adiciona todas as filas no escalonador.
+        System.out.println( this.escalanadorDeFilas);
+        // agenda primeiro controle de tempo (tabela laranja)
+        Controle controle = new Controle(Controle.ControleEnum.CHEGADA, escalanadorDeFilas.filas.get(0).chegadaInicial);
+        escalanadorDeFilas.agendamentos.add(controle);
     }
 
     public void agendaChegada(double aleatorio, Fila filaAtual) {
@@ -109,9 +73,20 @@ public class Simulador {
         // t + tempo atual
         double tempoRealChegada = tempoChegada + tempo;
 
-        Evento novaChegada = new Evento(Evento.TipoEnum.ENTRADA, tempoRealChegada);
-        eventosAgendados.add(novaChegada); // TODO: método para ordenar por tempo ao agendar -> menor tempo antes
-        System.out.println("AGENDADO |" + novaChegada.tipo + " | " + tempoRealChegada);
+        final Controle novoControle = new Controle(Controle.ControleEnum.CHEGADA, tempoRealChegada);
+        escalanadorDeFilas.agendamentos.add(novoControle);
+        escalanadorDeFilas.agendamentos.sort(Comparator.comparing(Controle::getTempo));
+    }
+
+    public void agendaSaida(double aleatorio, Fila filaAtual) {
+        // t = ((B-A) * aleatorio + A)
+        double tempoSaida = (filaAtual.saidaMaxima - filaAtual.saidaMinima) * aleatorio + filaAtual.saidaMinima;
+        // t + tempo atual
+        double tempoRealSaida = tempoSaida + tempo;
+
+        final Controle novoControle = new Controle(Controle.ControleEnum.SAIDA, tempoRealSaida);
+        escalanadorDeFilas.agendamentos.add(novoControle);
+        escalanadorDeFilas.agendamentos.sort(Comparator.comparing(Controle::getTempo));
     }
 }
 
