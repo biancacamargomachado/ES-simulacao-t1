@@ -1,12 +1,11 @@
-numeros-aleatorios: 7
-
+numeros-aleatorios: 100000
 filas:
   -
-    capacidade: 3
+    capacidade: 5
     chegada-inicial: 2.0
-    chegada-maxima: 2.0
-    chegada-minima: 1.0
-    saida-maxima: 6.0
+    chegada-maxima: 4.0
+    chegada-minima: 3.0
+    saida-maxima: 5.0
     saida-minima: 3.0
-    servidores: 1
+    servidores: 2
 

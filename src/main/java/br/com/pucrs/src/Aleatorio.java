@@ -39,7 +39,7 @@ public class Aleatorio {
 
         for(int i = 1; i<size; i++){
             numerosAleatorios[i] = ((a*numerosAleatorios[i-1] + c) % mod);
-            System.out.println(numerosAleatorios[i]/mod);
+            // System.out.println(numerosAleatorios[i]/mod);
         }
 
         return numerosAleatorios;
