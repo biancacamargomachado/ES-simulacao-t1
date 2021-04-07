@@ -14,6 +14,5 @@ public class Main {
         Aleatorio aleatorios = new Aleatorio(simulador.qtdNumerosAleatorios);
         aleatorios.geraPseudoAleatorio();
         simulador.simulacao(aleatorios);
-
     }
 }
