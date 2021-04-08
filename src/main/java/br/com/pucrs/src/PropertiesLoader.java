@@ -1,7 +1,6 @@
 package br.com.pucrs.src;
 
 import org.yaml.snakeyaml.Yaml;
-
 import java.io.InputStream;
 import java.util.Map;
 
