@@ -1,3 +1,9 @@
+/**
+ * Parte 1 do trabalho de Simulação e Métodos Analíticos.
+ *
+ * @author Bianca Camargo, Chiara Paskulin e Marcelo H. de Souza;
+ *
+ */
 package br.com.pucrs.src;
 
 public class Main {

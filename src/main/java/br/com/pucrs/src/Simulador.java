@@ -41,10 +41,10 @@ public class Simulador {
                 saida(eventoAtual, filaAtual, aleatorio);
             }
 
-            if (countAleatorios < this.qtdNumerosAleatorios && eventoAtual.tipo != Evento.TipoEnum.SAIDA) {
-                agendaChegada(aleatorio.numerosAleatorios[countAleatorios], filaAtual);
-                countAleatorios++;
-            }
+            // if (countAleatorios < this.qtdNumerosAleatorios && eventoAtual.tipo != Evento.TipoEnum.SAIDA) {
+            //    agendaChegada(aleatorio.numerosAleatorios[countAleatorios], filaAtual);
+            //    countAleatorios++;
+            //}
         }
 
         //Exibir probabilidades
@@ -52,9 +52,9 @@ public class Simulador {
     }
 
     private void entrada(Evento eventoAtual, Fila filaAtual, Aleatorio aleatorio){
-        if (filaAtual.populacaoAtual <= filaAtual.capacidade) {
+        // if (filaAtual.populacaoAtual <= filaAtual.capacidade) {
             this.ajustarProbabilidade(filaAtual);
-        }
+        // }
 
         //Se ainda tempo espaço na fila
         if (filaAtual.populacaoAtual < filaAtual.capacidade) {
@@ -70,6 +70,9 @@ public class Simulador {
             //Não conseguiu entrar na fila pois estava cheia. E contabilizada como uma pessoa perdida
             filaAtual.perdidos++;
         }
+
+        agendaChegada(aleatorio.numerosAleatorios[countAleatorios], filaAtual);
+        countAleatorios++;
     }
 
     private void saida(Evento eventoAtual, Fila filaAtual, Aleatorio aleatorio){
@@ -120,7 +123,7 @@ public class Simulador {
 
     public void agendaSaida(double aleatorio, Fila filaAtual) {
         // t = ((B-A) * aleatorio + A)
-        double tempoSaida = (filaAtual.saidaMaxima -  filaAtual.saidaMinima) * aleatorio + filaAtual.saidaMinima;
+        double tempoSaida = (filaAtual.saidaMaxima -  filaAtual.saidaMinima) * (aleatorio / (Math.pow(2,39)-5)) + filaAtual.saidaMinima;
         // t + tempo atual
         double tempoRealSaida = tempoSaida + tempo;
 
@@ -133,7 +136,7 @@ public class Simulador {
 
     public void agendaChegada(double aleatorio, Fila filaAtual) {
         // t = ((B-A) * aleatorio + A)
-        double tempoChegada = (filaAtual.chegadaMaxima - filaAtual.chegadaMinima) * aleatorio + filaAtual.chegadaMinima;
+        double tempoChegada = (filaAtual.chegadaMaxima - filaAtual.chegadaMinima) * (aleatorio / (Math.pow(2,39)-5)) + filaAtual.chegadaMinima;
         // t + tempo atual
         double tempoRealChegada = tempoChegada + tempo;
 
@@ -160,6 +163,7 @@ public class Simulador {
         }
 
         System.out.println(porcentagem + "%");
+        System.out.println("Tempo total: " + tempo);
     }
 }
 

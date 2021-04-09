@@ -34,8 +34,6 @@ public class Aleatorio {
     public void geraPseudoAleatorio(){
         numerosAleatorios = new double[size];
         numerosAleatorios[0] = semente;
-        System.out.println(numerosAleatorios[0] / mod);
-
         for(int i = 1; i<size; i++){
             numerosAleatorios[i] = ((a*numerosAleatorios[i-1] + c) % mod);
         }
