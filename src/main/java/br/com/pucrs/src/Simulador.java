@@ -15,16 +15,13 @@ public class Simulador {
     public double tempoAnterior = 0;
     public double[] probabilidade;
 
-    private int countAleatorios;
-
     public Simulador() {
         this.escalonadorDeFilas = new EscalonadorDeFilas();
     }
 
-    public void simulacao (Aleatorio aleatorio) {
-        countAleatorios = 0;
+    public void simulacao (Aleatorio aleatorios) {
 
-        while(countAleatorios < this.qtdNumerosAleatorios) {
+        while(aleatorios.qtAleatorios < this.qtdNumerosAleatorios) {
             Evento eventoAtual = eventosAgendados.get(0); //Pega o próximo evento a ocorrer
             eventosAgendados.remove(0);             //Remove o evento dos agendados, pois já está sendo executado
             eventosAcontecendo.add(eventoAtual);          //Adiciona no evento que está acontecendo
@@ -36,9 +33,9 @@ public class Simulador {
             Fila filaAtual = escalonadorDeFilas.filas.get(0);
 
             if (eventoAtual.tipo == Evento.TipoEnum.CHEGADA) {
-                chegada(eventoAtual, filaAtual, aleatorio);
+                chegada(eventoAtual, filaAtual, aleatorios.geraProximoAleatorio());
             } else if (eventoAtual.tipo == Evento.TipoEnum.SAIDA) {
-                saida(eventoAtual, filaAtual, aleatorio);
+                saida(eventoAtual, filaAtual, aleatorios.geraProximoAleatorio());
             }
         }
 
@@ -46,7 +43,7 @@ public class Simulador {
         this.exibirProbabilidade();
     }
 
-    private void chegada(Evento eventoAtual, Fila filaAtual, Aleatorio aleatorio){
+    private void chegada(Evento eventoAtual, Fila filaAtual, double aleatorio){
 
         this.ajustarProbabilidade(filaAtual);
 
@@ -57,27 +54,24 @@ public class Simulador {
             //Se só tem uma pessoa na fila ou nenhuma, essa pessoa já é atendida
             if (filaAtual.populacaoAtual <= filaAtual.servidores) {
                 System.out.println("EXECUTADO |" + eventoAtual.tipo + " | " + eventoAtual.tempo);
-                agendaSaida(aleatorio.numerosAleatorios[countAleatorios], filaAtual);
-                countAleatorios++; //Quando usou um aleatório, passa para próximo
+                agendaSaida(aleatorio, filaAtual);
             }
         } else {
             //Não conseguiu entrar na fila pois estava cheia. E contabilizada como uma pessoa perdida
             filaAtual.perdidos++;
         }
 
-        agendaChegada(aleatorio.numerosAleatorios[countAleatorios], filaAtual);
-        countAleatorios++;
+        agendaChegada(aleatorio, filaAtual);
     }
 
-    private void saida(Evento eventoAtual, Fila filaAtual, Aleatorio aleatorio){
+    private void saida(Evento eventoAtual, Fila filaAtual, double aleatorio){
         System.out.println("EXECUTADO |" + eventoAtual.tipo + " | " + eventoAtual.tempo);
         this.ajustarProbabilidade(filaAtual);
         filaAtual.populacaoAtual--;
 
         //Se tem gente na espera pra ficar de frente para o servidor
         if (filaAtual.populacaoAtual >= filaAtual.servidores) {
-            agendaSaida(aleatorio.numerosAleatorios[countAleatorios], filaAtual);
-            countAleatorios++; //Quando usou um aleatório, passa para próximo
+            agendaSaida(aleatorio, filaAtual);
         }
     }
 
@@ -130,7 +124,7 @@ public class Simulador {
 
     public void agendaChegada(double aleatorio, Fila filaAtual) {
         // t = ((B-A) * aleatorio + A)
-        double tempoChegada = (filaAtual.chegadaMaxima - filaAtual.chegadaMinima) * (aleatorio / (Math.pow(2,39)-5)) + filaAtual.chegadaMinima;
+        double tempoChegada = (filaAtual.chegadaMaxima - filaAtual.chegadaMinima) * aleatorio + filaAtual.chegadaMinima;
         // t + tempo atual
         double tempoRealChegada = tempoChegada + tempo;
 
