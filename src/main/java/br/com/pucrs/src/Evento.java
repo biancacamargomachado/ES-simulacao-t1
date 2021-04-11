@@ -10,7 +10,7 @@ public class Evento {
     }
 
     public enum TipoEnum {
-        ENTRADA, SAIDA;
+        CHEGADA, SAIDA;
     }
 
 }

@@ -35,26 +35,20 @@ public class Simulador {
 
             Fila filaAtual = escalonadorDeFilas.filas.get(0);
 
-            if (eventoAtual.tipo == Evento.TipoEnum.ENTRADA) {
-                entrada(eventoAtual, filaAtual, aleatorio);
+            if (eventoAtual.tipo == Evento.TipoEnum.CHEGADA) {
+                chegada(eventoAtual, filaAtual, aleatorio);
             } else if (eventoAtual.tipo == Evento.TipoEnum.SAIDA) {
                 saida(eventoAtual, filaAtual, aleatorio);
             }
-
-            // if (countAleatorios < this.qtdNumerosAleatorios && eventoAtual.tipo != Evento.TipoEnum.SAIDA) {
-            //    agendaChegada(aleatorio.numerosAleatorios[countAleatorios], filaAtual);
-            //    countAleatorios++;
-            //}
         }
 
         //Exibir probabilidades
         this.exibirProbabilidade();
     }
 
-    private void entrada(Evento eventoAtual, Fila filaAtual, Aleatorio aleatorio){
-        // if (filaAtual.populacaoAtual <= filaAtual.capacidade) {
-            this.ajustarProbabilidade(filaAtual);
-        // }
+    private void chegada(Evento eventoAtual, Fila filaAtual, Aleatorio aleatorio){
+
+        this.ajustarProbabilidade(filaAtual);
 
         //Se ainda tempo espaço na fila
         if (filaAtual.populacaoAtual < filaAtual.capacidade) {
@@ -116,7 +110,7 @@ public class Simulador {
         probabilidade = new double[escalonadorDeFilas.filas.get(0).capacidade + 1];
 
         //Agenda o primeiro evento
-        Evento primeiroEvento = new Evento(Evento.TipoEnum.ENTRADA, escalonadorDeFilas.filas.get(0).chegadaInicial);
+        Evento primeiroEvento = new Evento(Evento.TipoEnum.CHEGADA, escalonadorDeFilas.filas.get(0).chegadaInicial);
         eventosAgendados.add(primeiroEvento);
         System.out.println("AGENDADO |" + primeiroEvento.tipo + " | " + primeiroEvento.tempo);
     }
@@ -140,7 +134,7 @@ public class Simulador {
         // t + tempo atual
         double tempoRealChegada = tempoChegada + tempo;
 
-        Evento novaChegada = new Evento(Evento.TipoEnum.ENTRADA, tempoRealChegada);
+        Evento novaChegada = new Evento(Evento.TipoEnum.CHEGADA, tempoRealChegada);
         eventosAgendados.add(novaChegada);
         eventosAgendados.sort(Comparator.comparingDouble(event -> event.tempo));
 
@@ -158,11 +152,11 @@ public class Simulador {
 
         for (double item : probabilidade){
             porcentagem += (item / this.tempo);
-            String result = String.format("Value %.4f", (item / this.tempo));
+            String result = String.format("Value %.4f", ((item / this.tempo)*100));
             System.out.println(result + "%");
         }
 
-        System.out.println(porcentagem + "%");
+        System.out.println(porcentagem*100 + "%");
         System.out.println("Tempo total: " + tempo);
     }
 }
