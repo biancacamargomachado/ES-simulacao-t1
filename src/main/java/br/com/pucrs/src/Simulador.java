@@ -19,9 +19,9 @@ public class Simulador {
         this.escalonadorDeFilas = new EscalonadorDeFilas();
     }
 
-    public void simulacao (Aleatorio aleatorios) {
+    public void simulacao(Aleatorio aleatorios) {
 
-        while(aleatorios.qtAleatorios < this.qtdNumerosAleatorios) {
+        while (aleatorios.qtAleatorios < this.qtdNumerosAleatorios) {
             Evento eventoAtual = eventosAgendados.get(0); //Pega o próximo evento a ocorrer
             eventosAgendados.remove(0);             //Remove o evento dos agendados, pois já está sendo executado
             eventosAcontecendo.add(eventoAtual);          //Adiciona no evento que está acontecendo
@@ -43,7 +43,7 @@ public class Simulador {
         this.exibirProbabilidade();
     }
 
-    private void chegada(Evento eventoAtual, Fila filaAtual, double aleatorio){
+    private void chegada(Evento eventoAtual, Fila filaAtual, double aleatorio) {
 
         this.ajustarProbabilidade(filaAtual);
 
@@ -64,7 +64,7 @@ public class Simulador {
         agendaChegada(aleatorio, filaAtual);
     }
 
-    private void saida(Evento eventoAtual, Fila filaAtual, double aleatorio){
+    private void saida(Evento eventoAtual, Fila filaAtual, double aleatorio) {
         System.out.println("EXECUTADO |" + eventoAtual.tipo + " | " + eventoAtual.tempo);
         this.ajustarProbabilidade(filaAtual);
         filaAtual.populacaoAtual--;
@@ -86,19 +86,38 @@ public class Simulador {
         //Mapeia do .yml para uma instancia de Fila a representacao dos dados contidos no arquivo
         List<Fila> filas = dadosFilas.stream().map(fila -> {
             Fila novaFila = new Fila();
+            novaFila.id = (int) fila.get("id");
             novaFila.capacidade = (int) fila.get("capacidade");
-            novaFila.chegadaInicial = (double) fila.get("chegada-inicial");
-            novaFila.chegadaMaxima = (double) fila.get("chegada-maxima");
-            novaFila.chegadaMinima = (double) fila.get("chegada-minima");
-            novaFila.saidaMaxima = (double) fila.get("saida-maxima");
-            novaFila.saidaMinima = (double) fila.get("saida-minima");
+            novaFila.chegadaInicial = (double) (fila.containsKey("chegada-inicial") ? fila.get("chegada-inicial") : -1.0);
+            novaFila.chegadaMaxima = (double) (fila.containsKey("chegada-maxima") ? fila.get("chegada-maxima") : -1.0);
+            novaFila.chegadaMinima = (double) (fila.containsKey("chegada-minima") ? fila.get("chegada-minima") : -1.0);
+            novaFila.saidaMaxima = (double) (fila.containsKey("saida-maxima") ? fila.get("saida-maxima") : -1.0);
+            novaFila.saidaMinima = (double) (fila.containsKey("saida-minima") ? fila.get("saida-minima") : -1.0);
             novaFila.servidores = (int) fila.get("servidores");
             return novaFila;
         }).collect(Collectors.toList());
 
-        System.out.println("EVENTO   |" + "tipo    |" +  " tempo");
+        //montar topologia de rede
+        final List<LinkedHashMap<String, Object>> dadosRedes = (List<LinkedHashMap<String, Object>>) dados.get("redes");
+
+        for (HashMap<String, Object> rede : dadosRedes) {
+
+            int origem = (int) rede.get("origem");
+            int destino = (int) rede.get("destino");
+            double probabilidade = (double) rede.get("probabilidade");
+
+            Fila filaOrigem = filas.stream().filter(f -> f.id == origem).findFirst().get();
+            Fila filaDestino = filas.stream().filter(f -> f.id == destino).findFirst().get();
+            filaOrigem.filaDestino.put(destino, filaDestino);
+            filaOrigem.probabilidades.put(destino, probabilidade);
+        }
+
+        System.out.println(filas);
+
+        System.out.println("EVENTO   |" + "tipo    |" + " tempo");
         escalonadorDeFilas.filas.addAll(filas); //Adiciona todas filas no escalonador
         escalonadorDeFilas.filas.remove(0); //Remove o primeiro item, que é vazio
+
 
         //Adiciona probabilidade % de chance de a fila estar com x pessoas em seu k
         probabilidade = new double[escalonadorDeFilas.filas.get(0).capacidade + 1];
@@ -111,7 +130,7 @@ public class Simulador {
 
     public void agendaSaida(double aleatorio, Fila filaAtual) {
         // t = ((B-A) * aleatorio + A)
-        double tempoSaida = (filaAtual.saidaMaxima -  filaAtual.saidaMinima) * (aleatorio / (Math.pow(2,39)-5)) + filaAtual.saidaMinima;
+        double tempoSaida = (filaAtual.saidaMaxima - filaAtual.saidaMinima) * (aleatorio / (Math.pow(2, 39) - 5)) + filaAtual.saidaMinima;
         // t + tempo atual
         double tempoRealSaida = tempoSaida + tempo;
 
@@ -144,13 +163,13 @@ public class Simulador {
 
         double porcentagem = 0;
 
-        for (double item : probabilidade){
+        for (double item : probabilidade) {
             porcentagem += (item / this.tempo);
-            String result = String.format("Value %.4f", ((item / this.tempo)*100));
+            String result = String.format("Value %.4f", ((item / this.tempo) * 100));
             System.out.println(result + "%");
         }
 
-        System.out.println(porcentagem*100 + "%");
+        System.out.println(porcentagem * 100 + "%");
         System.out.println("Tempo total: " + tempo);
     }
 }
