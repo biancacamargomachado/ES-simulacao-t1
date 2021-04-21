@@ -97,9 +97,11 @@ public class Simulador {
             return novaFila;
         }).collect(Collectors.toList());
 
-        //montar topologia de rede
+        // montar topologia de rede
+        // dados de rede contém todas a filas
         final List<LinkedHashMap<String, Object>> dadosRedes = (List<LinkedHashMap<String, Object>>) dados.get("redes");
 
+        // itera a estrutura para popular as filas
         for (HashMap<String, Object> rede : dadosRedes) {
 
             int origem = (int) rede.get("origem");
@@ -108,7 +110,11 @@ public class Simulador {
 
             Fila filaOrigem = filas.stream().filter(f -> f.id == origem).findFirst().get();
             Fila filaDestino = filas.stream().filter(f -> f.id == destino).findFirst().get();
+
+            // relaciona o destino à origem
             filaOrigem.filaDestino.put(destino, filaDestino);
+
+            // propabilidade que é passada no arquivo yml
             filaOrigem.probabilidades.put(destino, probabilidade);
         }
 
@@ -139,6 +145,24 @@ public class Simulador {
         eventosAgendados.sort(Comparator.comparingDouble(event -> event.tempo));
 
         System.out.println("AGENDADO |" + novaSaida.tipo + " | " + tempoRealSaida);
+    }
+
+    public void agendaSaida(double aleatorio, Fila filaAtual, Fila destino) {
+        // t = ((B-A) * aleatorio + A)
+        double tempoSaida = (filaAtual.saidaMaxima - filaAtual.saidaMinima) * (aleatorio / (Math.pow(2, 39) - 5)) + filaAtual.saidaMinima;
+        // t + tempo atual
+        double tempoRealSaida = tempoSaida + tempo;
+
+        Evento novaSaida = new Evento(Evento.TipoEnum.SAIDA, tempoRealSaida);
+        eventosAgendados.add(novaSaida);
+        eventosAgendados.sort(Comparator.comparingDouble(event -> event.tempo));
+
+        System.out.println("AGENDADO |" + novaSaida.tipo + " | " + tempoRealSaida);
+    }
+
+    public void sorteiaFila(Fila origem) {
+        Random random = new Random();
+        int filaID = random.nextInt();
     }
 
     public void agendaChegada(double aleatorio, Fila filaAtual) {
