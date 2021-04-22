@@ -35,14 +35,14 @@ public class Simulador {
             Fila filaDestino = eventoAtual.destino;
 
             if (eventoAtual.tipo == Evento.TipoEnum.CHEGADA) {
-                chegada(eventoAtual, filaAtual, aleatorios.geraProximoAleatorio());
+                chegada(eventoAtual, filaAtual, aleatorios.geraProximoAleatorio(), false);
 
             } else if (eventoAtual.tipo == Evento.TipoEnum.SAIDA) {
                 saida(eventoAtual, filaAtual, aleatorios.geraProximoAleatorio());
 
                 // sai de uma fila e vai para outra
                 if (filaDestino != null) {
-                    chegada(eventoAtual, filaDestino, aleatorios.geraProximoAleatorio());
+                    chegada(eventoAtual, filaDestino, aleatorios.geraProximoAleatorio(), true);
                 }
 
             }
@@ -53,7 +53,7 @@ public class Simulador {
         this.exibirProbabilidade();
     }
 
-    private void chegada(Evento eventoAtual, Fila filaAtual, double aleatorio) {
+    private void chegada(Evento eventoAtual, Fila filaAtual, double aleatorio, boolean ehFilaDestino) {
 
         this.ajustarProbabilidade(filaAtual);
 
@@ -78,7 +78,9 @@ public class Simulador {
             filaAtual.perdidos++;
         }
 
-        agendaChegada(aleatorio, filaAtual);
+        if (ehFilaDestino == false){
+            agendaChegada(aleatorio, filaAtual);
+        }
     }
 
     private void saida(Evento eventoAtual, Fila filaAtual, double aleatorio) {
