@@ -26,8 +26,7 @@ public class Simulador {
             eventosAgendados.remove(0);             //Remove o evento dos agendados, pois já está sendo executado
             eventosAcontecendo.add(eventoAtual);          //Adiciona no evento que está acontecendo
 
-            //Variável tempoAnterior é utilizada para o cálculo de probabilidade
-            tempoAnterior = tempo;
+
             tempo = eventoAtual.tempo;
 
             // id da fila menos index da fila na lista
@@ -56,16 +55,20 @@ public class Simulador {
 
         this.ajustarProbabilidade();
 
+        //Variável tempoAnterior é utilizada para o cálculo de probabilidade
+        tempoAnterior = tempo;
+
         //Se ainda tempo espaço na fila
         if (filaAtual.populacaoAtual < filaAtual.capacidade) {
             filaAtual.populacaoAtual++;
 
             //Se só tem uma pessoa na fila ou nenhuma, essa pessoa já é atendida
             if (filaAtual.populacaoAtual <= filaAtual.servidores) {
-                System.out.println("EXECUTADO |" + eventoAtual.tipo + " | " + eventoAtual.tempo + " | " + eventoAtual.fila.id);
+                System.out.println("EXECUTADO |" + eventoAtual.tipo + " | " + eventoAtual.tempo);
 
                 // decide se sai da fila ou não
                 final Fila destino = sorteioFila(filaAtual);
+
                 if (destino == null) {
                     agendaSaida(Aleatorio.geraProximoAleatorioTeste(), filaAtual);
                 } else {
@@ -87,17 +90,21 @@ public class Simulador {
 
         this.ajustarProbabilidade();
 
+        //Variável tempoAnterior é utilizada para o cálculo de probabilidade
+        tempoAnterior = tempo;
+
         filaAtual.populacaoAtual--;
 
         //Se tem gente na espera pra ficar de frente para o servidor
         if (filaAtual.populacaoAtual >= filaAtual.servidores) {
             agendaSaida(Aleatorio.geraProximoAleatorioTeste(), filaAtual);
+
         }
     }
 
     public void agendaChegada(double aleatorio, Fila filaAtual) {
         // t = ((B-A) * aleatorio + A)
-        double tempoChegada = (filaAtual.chegadaMaxima - filaAtual.chegadaMinima) * aleatorio + filaAtual.chegadaMinima;
+        double tempoChegada = (filaAtual.chegadaMaxima - filaAtual.chegadaMinima) * (aleatorio + filaAtual.chegadaMinima);
         // t + tempo atual
         double tempoRealChegada = tempoChegada + tempo;
 
@@ -105,7 +112,7 @@ public class Simulador {
         eventosAgendados.add(novaChegada);
         eventosAgendados.sort(Comparator.comparingDouble(event -> event.tempo));
 
-        System.out.println("AGENDADO |" + novaChegada.tipo + " | " + tempoRealChegada);
+        //System.out.println("AGENDADO |" + novaChegada.tipo + " | " + tempoRealChegada);
     }
 
     public void agendaSaida(double aleatorio, Fila filaAtual) {
@@ -119,7 +126,7 @@ public class Simulador {
         eventosAgendados.add(novaSaida);
         eventosAgendados.sort(Comparator.comparingDouble(event -> event.tempo));
 
-        System.out.println("AGENDADO |" + novaSaida.tipo + " | " + tempoRealSaida);
+        //System.out.println("AGENDADO |" + novaSaida.tipo + " | " + tempoRealSaida);
     }
 
     public void agendaSaida(double aleatorio, Fila filaAtual, Fila destino) {
@@ -134,7 +141,7 @@ public class Simulador {
         eventosAgendados.add(novaSaida);
         eventosAgendados.sort(Comparator.comparingDouble(event -> event.tempo));
 
-        System.out.println("AGENDADO |" + novaSaida.tipo + " | " + tempoRealSaida);
+        //System.out.println("AGENDADO |" + novaSaida.tipo + " | " + tempoRealSaida);
     }
 
     public Fila sorteioFila(final Fila origem) {
@@ -159,12 +166,12 @@ public class Simulador {
     }
 
     public void exibirProbabilidade() {
-        System.out.println("Probabilidades:");
+        System.out.println("******************************");
 
         double porcentagem = 0;
 
         for (int id : probabilidades.keySet()) {
-            System.out.println("FILA " + id);
+            System.out.println("- FILA " + id);
             for (double prob : probabilidades.get(id)) {
                 porcentagem += (prob / this.tempo);
                 String result = String.format("Value %.4f", ((prob / this.tempo) * 100));
@@ -175,6 +182,8 @@ public class Simulador {
             System.out.println("Tempo total: " + tempo);
             porcentagem = 0;
         }
+        System.out.println("******************************");
+
     }
 
     public void mapearYamlParaPOJO() {
@@ -220,9 +229,7 @@ public class Simulador {
             filaOrigem.probabilidades.put(destino, probabilidade);
         }
 
-        System.out.println(filas);
-
-        System.out.println("EVENTO   |" + "tipo    |" + " tempo");
+        System.out.println("EVENTO   |" + "TIPO    |" + " TEMPO");
         escalonadorDeFilas.filas.addAll(filas); //Adiciona todas filas no escalonador
         escalonadorDeFilas.filas.remove(0); //Remove o primeiro item, que é vazio
 
@@ -237,7 +244,7 @@ public class Simulador {
         //Agenda o primeiro evento
         Evento primeiroEvento = new Evento(Evento.TipoEnum.CHEGADA, escalonadorDeFilas.filas.get(0).chegadaInicial, filas.get(0), null); // pega a primeira fila
         eventosAgendados.add(primeiroEvento);
-        System.out.println("AGENDADO |" + primeiroEvento.tipo + " | " + primeiroEvento.tempo);
+        //System.out.println("AGENDADO |" + primeiroEvento.tipo + " | " + primeiroEvento.tempo);
     }
 
 }
