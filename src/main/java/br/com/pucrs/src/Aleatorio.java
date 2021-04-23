@@ -1,5 +1,8 @@
 package br.com.pucrs.src;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 public class Aleatorio {
     /**
      * c = constante usada para maior variação dos números gerados
@@ -12,12 +15,17 @@ public class Aleatorio {
     public int semente;
     public int size;
     public double ultimoAleatorio;
-    public double qtAleatorios;
+    public static double qtAleatorios;
+
+    public static int index = 0;
+
+    public static ArrayList<Double> arrayTest = new ArrayList<Double> (Arrays.asList(0.9921, 0.0004, 0.5534, 0.2761, 0.3398, 0.8963, 0.9023, 0.0132,
+            0.4569, 0.5121, 0.9208, 0.0171, 0.2299, 0.8545, 0.06001, 0.6001, 0.2921));
 
     public Aleatorio(int size) {
         this.a = 54564;
         this.c = 31;
-        this.mod = Math.pow(2,39)-5;
+        this.mod = Math.pow(2, 39) - 5;
         this.semente = 7;
         this.size = size;
         this.ultimoAleatorio = semente;
@@ -44,9 +52,18 @@ public class Aleatorio {
     }
      */
 
-    public double geraProximoAleatorio(){
-        ultimoAleatorio = ((a*ultimoAleatorio + c) % mod)/mod;
+    public double geraProximoAleatorio() {
+        ultimoAleatorio = ((a * ultimoAleatorio + c) % mod) / mod;
         qtAleatorios++;
         return ultimoAleatorio;
+    }
+
+
+    /**
+     * @return
+     */
+    public static double geraProximoAleatorioTeste() {
+        qtAleatorios++;
+        return arrayTest.get(index++);
     }
 }

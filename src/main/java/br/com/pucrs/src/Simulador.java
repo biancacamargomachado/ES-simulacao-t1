@@ -35,14 +35,16 @@ public class Simulador {
             Fila filaDestino = eventoAtual.destino;
 
             if (eventoAtual.tipo == Evento.TipoEnum.CHEGADA) {
-                chegada(eventoAtual, filaAtual, aleatorios.geraProximoAleatorio(), false);
+                chegada(eventoAtual, filaAtual, Aleatorio.geraProximoAleatorioTeste(), false);
 
             } else if (eventoAtual.tipo == Evento.TipoEnum.SAIDA) {
-                saida(eventoAtual, filaAtual, aleatorios.geraProximoAleatorio());
+
+                double aleatorio = Aleatorio.geraProximoAleatorioTeste();
+                saida(eventoAtual, filaAtual, aleatorio);
 
                 // sai de uma fila e vai para outra
                 if (filaDestino != null) {
-                    chegada(eventoAtual, filaDestino, aleatorios.geraProximoAleatorio(), true);
+                    chegada(eventoAtual, filaDestino, aleatorio, true);
                 }
 
             }
@@ -55,7 +57,7 @@ public class Simulador {
 
     private void chegada(Evento eventoAtual, Fila filaAtual, double aleatorio, boolean ehFilaDestino) {
 
-        this.ajustarProbabilidade(filaAtual);
+        this.ajustarProbabilidade();
 
         //Se ainda tempo espaço na fila
         if (filaAtual.populacaoAtual < filaAtual.capacidade) {
@@ -78,14 +80,16 @@ public class Simulador {
             filaAtual.perdidos++;
         }
 
-        if (ehFilaDestino == false){
+        if (ehFilaDestino == false) {
             agendaChegada(aleatorio, filaAtual);
         }
     }
 
     private void saida(Evento eventoAtual, Fila filaAtual, double aleatorio) {
         System.out.println("EXECUTADO |" + eventoAtual.tipo + " | " + eventoAtual.tempo);
-        this.ajustarProbabilidade(filaAtual);
+
+        this.ajustarProbabilidade();
+
         filaAtual.populacaoAtual--;
 
         //Se tem gente na espera pra ficar de frente para o servidor
@@ -151,7 +155,6 @@ public class Simulador {
         escalonadorDeFilas.filas.forEach(f -> {
             probabilidades.put(f.id, new double[f.capacidade + 1]);
         });
-        double[] teste = probabilidades.get(1);
         //Agenda o primeiro evento
         Evento primeiroEvento = new Evento(Evento.TipoEnum.CHEGADA, escalonadorDeFilas.filas.get(0).chegadaInicial, filas.get(0), null); // pega a primeira fila
         eventosAgendados.add(primeiroEvento);
@@ -160,7 +163,7 @@ public class Simulador {
 
     public void agendaSaida(double aleatorio, Fila filaAtual) {
         // t = ((B-A) * aleatorio + A)
-        double tempoSaida = (filaAtual.saidaMaxima - filaAtual.saidaMinima) * (aleatorio / (Math.pow(2, 39) - 5)) + filaAtual.saidaMinima;
+        double tempoSaida = (filaAtual.saidaMaxima - filaAtual.saidaMinima) * aleatorio + filaAtual.saidaMinima;
         // t + tempo atual
         double tempoRealSaida = tempoSaida + tempo;
 
@@ -174,7 +177,8 @@ public class Simulador {
 
     public void agendaSaida(double aleatorio, Fila filaAtual, Fila destino) {
         // t = ((B-A) * aleatorio + A)
-        double tempoSaida = (filaAtual.saidaMaxima - filaAtual.saidaMinima) * (aleatorio / (Math.pow(2, 39) - 5)) + filaAtual.saidaMinima;
+
+        double tempoSaida = (filaAtual.saidaMaxima - filaAtual.saidaMinima) * aleatorio + filaAtual.saidaMinima;
         // t + tempo atual
         double tempoRealSaida = tempoSaida + tempo;
 
@@ -214,8 +218,10 @@ public class Simulador {
         System.out.println("AGENDADO |" + novaChegada.tipo + " | " + tempoRealChegada);
     }
 
-    public void ajustarProbabilidade(Fila filaAtual) {
-        probabilidades.get(filaAtual.id)[filaAtual.populacaoAtual] += this.tempo - this.tempoAnterior;
+    public void ajustarProbabilidade() {
+        for (Fila fila : escalonadorDeFilas.filas) {
+            probabilidades.get(fila.id)[fila.populacaoAtual] += this.tempo - this.tempoAnterior;
+        }
     }
 
     public void exibirProbabilidade() {
@@ -233,6 +239,7 @@ public class Simulador {
 
             System.out.println(porcentagem * 100 + "%");
             System.out.println("Tempo total: " + tempo);
+            porcentagem = 0;
         }
     }
 }

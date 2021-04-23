@@ -1,21 +1,21 @@
-numeros-aleatorios: 100000
+numeros-aleatorios: 16
 
 filas:
   -
     id: 1
-    capacidade: 5
-    chegada-inicial: 3.0
-    chegada-maxima: 4.0
+    servidores: 2
+    capacidade: 3
+    chegada-inicial: 2.5
     chegada-minima: 2.0
+    chegada-maxima: 3.0
+    saida-minima: 2.0
     saida-maxima: 5.0
-    saida-minima: 3.0
-    servidores: 1
   -
     id: 2
-    capacidade: 5
-    saida-maxima: 5.0
-    saida-minima: 3.0
     servidores: 1
+    capacidade: 3
+    saida-minima: 3.0
+    saida-maxima: 5.0
 
 redes:
   -
