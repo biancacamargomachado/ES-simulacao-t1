@@ -35,27 +35,24 @@ public class Simulador {
             Fila filaDestino = eventoAtual.destino;
 
             if (eventoAtual.tipo == Evento.TipoEnum.CHEGADA) {
-                chegada(eventoAtual, filaAtual, Aleatorio.geraProximoAleatorioTeste(), false);
+                chegada(eventoAtual, filaAtual, false);
 
             } else if (eventoAtual.tipo == Evento.TipoEnum.SAIDA) {
 
-                double aleatorio = Aleatorio.geraProximoAleatorioTeste();
-                saida(eventoAtual, filaAtual, aleatorio);
+                saida(eventoAtual, filaAtual);
 
                 // sai de uma fila e vai para outra
                 if (filaDestino != null) {
-                    chegada(eventoAtual, filaDestino, aleatorio, true);
+                    chegada(eventoAtual, filaDestino, true);
                 }
-
             }
-
         }
 
         //Exibir probabilidades
         this.exibirProbabilidade();
     }
 
-    private void chegada(Evento eventoAtual, Fila filaAtual, double aleatorio, boolean ehFilaDestino) {
+    private void chegada(Evento eventoAtual, Fila filaAtual, boolean ehFilaDestino) {
 
         this.ajustarProbabilidade();
 
@@ -70,9 +67,9 @@ public class Simulador {
                 // decide se sai da fila ou não
                 final Fila destino = sorteioFila(filaAtual);
                 if (destino == null) {
-                    agendaSaida(aleatorio, filaAtual);
+                    agendaSaida(Aleatorio.geraProximoAleatorioTeste(), filaAtual);
                 } else {
-                    agendaSaida(aleatorio, filaAtual, destino);
+                    agendaSaida(Aleatorio.geraProximoAleatorioTeste(), filaAtual, destino);
                 }
             }
         } else {
@@ -81,11 +78,11 @@ public class Simulador {
         }
 
         if (ehFilaDestino == false) {
-            agendaChegada(aleatorio, filaAtual);
+            agendaChegada(Aleatorio.geraProximoAleatorioTeste(), filaAtual);
         }
     }
 
-    private void saida(Evento eventoAtual, Fila filaAtual, double aleatorio) {
+    private void saida(Evento eventoAtual, Fila filaAtual) {
         System.out.println("EXECUTADO |" + eventoAtual.tipo + " | " + eventoAtual.tempo);
 
         this.ajustarProbabilidade();
@@ -94,7 +91,89 @@ public class Simulador {
 
         //Se tem gente na espera pra ficar de frente para o servidor
         if (filaAtual.populacaoAtual >= filaAtual.servidores) {
-            agendaSaida(aleatorio, filaAtual);
+            agendaSaida(Aleatorio.geraProximoAleatorioTeste(), filaAtual);
+        }
+    }
+
+    public void agendaChegada(double aleatorio, Fila filaAtual) {
+        // t = ((B-A) * aleatorio + A)
+        double tempoChegada = (filaAtual.chegadaMaxima - filaAtual.chegadaMinima) * aleatorio + filaAtual.chegadaMinima;
+        // t + tempo atual
+        double tempoRealChegada = tempoChegada + tempo;
+
+        Evento novaChegada = new Evento(Evento.TipoEnum.CHEGADA, tempoRealChegada, filaAtual, null);
+        eventosAgendados.add(novaChegada);
+        eventosAgendados.sort(Comparator.comparingDouble(event -> event.tempo));
+
+        System.out.println("AGENDADO |" + novaChegada.tipo + " | " + tempoRealChegada);
+    }
+
+    public void agendaSaida(double aleatorio, Fila filaAtual) {
+        // t = ((B-A) * aleatorio + A)
+        double tempoSaida = (filaAtual.saidaMaxima - filaAtual.saidaMinima) * aleatorio + filaAtual.saidaMinima;
+        // t + tempo atual
+        double tempoRealSaida = tempoSaida + tempo;
+
+        // continua na mesma fila (fila atual)
+        Evento novaSaida = new Evento(Evento.TipoEnum.SAIDA, tempoRealSaida, filaAtual, null);
+        eventosAgendados.add(novaSaida);
+        eventosAgendados.sort(Comparator.comparingDouble(event -> event.tempo));
+
+        System.out.println("AGENDADO |" + novaSaida.tipo + " | " + tempoRealSaida);
+    }
+
+    public void agendaSaida(double aleatorio, Fila filaAtual, Fila destino) {
+        // t = ((B-A) * aleatorio + A)
+
+        double tempoSaida = (filaAtual.saidaMaxima - filaAtual.saidaMinima) * aleatorio + filaAtual.saidaMinima;
+        // t + tempo atual
+        double tempoRealSaida = tempoSaida + tempo;
+
+        // vai para outra fila (fila destino)
+        Evento novaSaida = new Evento(Evento.TipoEnum.SAIDA, tempoRealSaida, filaAtual, destino);
+        eventosAgendados.add(novaSaida);
+        eventosAgendados.sort(Comparator.comparingDouble(event -> event.tempo));
+
+        System.out.println("AGENDADO |" + novaSaida.tipo + " | " + tempoRealSaida);
+    }
+
+    public Fila sorteioFila(final Fila origem) {
+        final Random random = new Random();
+        final double number = random.nextDouble() * 1.0;
+
+        Fila destino = null;
+        for (Integer fila : origem.probabilidades.keySet()) {
+            double probabilidade = origem.probabilidades.get(fila);
+            if (number <= probabilidade) {
+                destino = origem.filaDestino.get(fila);
+                break;
+            }
+        }
+        return destino;
+    }
+
+    public void ajustarProbabilidade() {
+        for (Fila fila : escalonadorDeFilas.filas) {
+            probabilidades.get(fila.id)[fila.populacaoAtual] += this.tempo - this.tempoAnterior;
+        }
+    }
+
+    public void exibirProbabilidade() {
+        System.out.println("Probabilidades:");
+
+        double porcentagem = 0;
+
+        for (int id : probabilidades.keySet()) {
+            System.out.println("FILA " + id);
+            for (double prob : probabilidades.get(id)) {
+                porcentagem += (prob / this.tempo);
+                String result = String.format("Value %.4f", ((prob / this.tempo) * 100));
+                System.out.println(result + "%");
+            }
+
+            System.out.println(porcentagem * 100 + "%");
+            System.out.println("Tempo total: " + tempo);
+            porcentagem = 0;
         }
     }
 
@@ -161,86 +240,5 @@ public class Simulador {
         System.out.println("AGENDADO |" + primeiroEvento.tipo + " | " + primeiroEvento.tempo);
     }
 
-    public void agendaSaida(double aleatorio, Fila filaAtual) {
-        // t = ((B-A) * aleatorio + A)
-        double tempoSaida = (filaAtual.saidaMaxima - filaAtual.saidaMinima) * aleatorio + filaAtual.saidaMinima;
-        // t + tempo atual
-        double tempoRealSaida = tempoSaida + tempo;
-
-        // continua na mesma fila (fila atual)
-        Evento novaSaida = new Evento(Evento.TipoEnum.SAIDA, tempoRealSaida, filaAtual, null);
-        eventosAgendados.add(novaSaida);
-        eventosAgendados.sort(Comparator.comparingDouble(event -> event.tempo));
-
-        System.out.println("AGENDADO |" + novaSaida.tipo + " | " + tempoRealSaida);
-    }
-
-    public void agendaSaida(double aleatorio, Fila filaAtual, Fila destino) {
-        // t = ((B-A) * aleatorio + A)
-
-        double tempoSaida = (filaAtual.saidaMaxima - filaAtual.saidaMinima) * aleatorio + filaAtual.saidaMinima;
-        // t + tempo atual
-        double tempoRealSaida = tempoSaida + tempo;
-
-        // vai para outra fila (fila destino)
-        Evento novaSaida = new Evento(Evento.TipoEnum.SAIDA, tempoRealSaida, filaAtual, destino);
-        eventosAgendados.add(novaSaida);
-        eventosAgendados.sort(Comparator.comparingDouble(event -> event.tempo));
-
-        System.out.println("AGENDADO |" + novaSaida.tipo + " | " + tempoRealSaida);
-    }
-
-    public Fila sorteioFila(final Fila origem) {
-        final Random random = new Random();
-        final double number = random.nextDouble() * 1.0;
-
-        Fila destino = null;
-        for (Integer fila : origem.probabilidades.keySet()) {
-            double probabilidade = origem.probabilidades.get(fila);
-            if (number <= probabilidade) {
-                destino = origem.filaDestino.get(fila);
-                break;
-            }
-        }
-        return destino;
-    }
-
-    public void agendaChegada(double aleatorio, Fila filaAtual) {
-        // t = ((B-A) * aleatorio + A)
-        double tempoChegada = (filaAtual.chegadaMaxima - filaAtual.chegadaMinima) * aleatorio + filaAtual.chegadaMinima;
-        // t + tempo atual
-        double tempoRealChegada = tempoChegada + tempo;
-
-        Evento novaChegada = new Evento(Evento.TipoEnum.CHEGADA, tempoRealChegada, filaAtual, null);
-        eventosAgendados.add(novaChegada);
-        eventosAgendados.sort(Comparator.comparingDouble(event -> event.tempo));
-
-        System.out.println("AGENDADO |" + novaChegada.tipo + " | " + tempoRealChegada);
-    }
-
-    public void ajustarProbabilidade() {
-        for (Fila fila : escalonadorDeFilas.filas) {
-            probabilidades.get(fila.id)[fila.populacaoAtual] += this.tempo - this.tempoAnterior;
-        }
-    }
-
-    public void exibirProbabilidade() {
-        System.out.println("Probabilidades:");
-
-        double porcentagem = 0;
-
-        for (int id : probabilidades.keySet()) {
-            System.out.println("FILA " + id);
-            for (double prob : probabilidades.get(id)) {
-                porcentagem += (prob / this.tempo);
-                String result = String.format("Value %.4f", ((prob / this.tempo) * 100));
-                System.out.println(result + "%");
-            }
-
-            System.out.println(porcentagem * 100 + "%");
-            System.out.println("Tempo total: " + tempo);
-            porcentagem = 0;
-        }
-    }
 }
 

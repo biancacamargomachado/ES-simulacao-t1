@@ -16,5 +16,7 @@ public class Main {
         Aleatorio aleatorios = new Aleatorio(16);
 
         simulador.simulacao(aleatorios);
+
+        //Aleatorio.arrayTest.forEach(c -> System.out.println());
     }
 }
