@@ -7,6 +7,7 @@ public class Simulador {
 
     public final String ARQUIVO_YML = "application.yml"; //Arquivo com as configurações da fila
 
+    public static  int NUMBER_EVENT = 1;
     public int qtdNumerosAleatorios;
     public EscalonadorDeFilas escalonadorDeFilas;
     public List<Evento> eventosAcontecendo = new ArrayList<>();
@@ -64,7 +65,7 @@ public class Simulador {
 
             //Se só tem uma pessoa na fila ou nenhuma, essa pessoa já é atendida
             if (filaAtual.populacaoAtual <= filaAtual.servidores) {
-                System.out.println("EXECUTADO |" + eventoAtual.tipo + " | " + eventoAtual.tempo);
+                System.out.printf("(%02d) %s | %.2f \n", NUMBER_EVENT++, eventoAtual.tipo.name(), eventoAtual.tempo);
 
                 // decide se sai da fila ou não
                 final Fila destino = sorteioFila(filaAtual);
@@ -86,7 +87,7 @@ public class Simulador {
     }
 
     private void saida(Evento eventoAtual, Fila filaAtual) {
-        System.out.println("EXECUTADO |" + eventoAtual.tipo + " | " + eventoAtual.tempo);
+        System.out.printf("(%02d) %s   | %.2f \n", NUMBER_EVENT++, eventoAtual.tipo.name(), eventoAtual.tempo);
 
         this.ajustarProbabilidade();
 
@@ -229,7 +230,7 @@ public class Simulador {
             filaOrigem.probabilidades.put(destino, probabilidade);
         }
 
-        System.out.println("EVENTO   |" + "TIPO    |" + " TEMPO");
+        System.out.println("EVENTO       |" + " TEMPO");
         escalonadorDeFilas.filas.addAll(filas); //Adiciona todas filas no escalonador
         escalonadorDeFilas.filas.remove(0); //Remove o primeiro item, que é vazio
 
