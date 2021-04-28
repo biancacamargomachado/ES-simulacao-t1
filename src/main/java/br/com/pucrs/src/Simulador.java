@@ -27,7 +27,6 @@ public class Simulador {
             eventosAgendados.remove(0);             //Remove o evento dos agendados, pois já está sendo executado
             eventosAcontecendo.add(eventoAtual);          //Adiciona no evento que está acontecendo
 
-
             tempo = eventoAtual.tempo;
 
             // id da fila menos index da fila na lista
@@ -44,6 +43,7 @@ public class Simulador {
                 // sai de uma fila e vai para outra
                 if (filaDestino != null) {
                     chegada(eventoAtual, filaDestino, true);
+                    // passagem = enum.PASSAGEM
                 }
             }
         }
@@ -71,9 +71,9 @@ public class Simulador {
                 final Fila destino = sorteioFila(filaAtual);
 
                 if (destino == null) {
-                    agendaSaida(Aleatorio.geraProximoAleatorioTeste(), filaAtual);
+                    agendaSaida(Aleatorio.geraProximoAleatorio(), filaAtual);
                 } else {
-                    agendaSaida(Aleatorio.geraProximoAleatorioTeste(), filaAtual, destino);
+                    agendaSaida(Aleatorio.geraProximoAleatorio(), filaAtual, destino);
                 }
             }
         } else {
@@ -82,7 +82,7 @@ public class Simulador {
         }
 
         if (ehFilaDestino == false) {
-            agendaChegada(Aleatorio.geraProximoAleatorioTeste(), filaAtual);
+            agendaChegada(Aleatorio.geraProximoAleatorio(), filaAtual);
         }
     }
 
@@ -98,7 +98,7 @@ public class Simulador {
 
         //Se tem gente na espera pra ficar de frente para o servidor
         if (filaAtual.populacaoAtual >= filaAtual.servidores) {
-            agendaSaida(Aleatorio.geraProximoAleatorioTeste(), filaAtual);
+            agendaSaida(Aleatorio.geraProximoAleatorio(), filaAtual);
 
         }
     }
