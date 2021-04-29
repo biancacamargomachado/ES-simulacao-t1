@@ -19,7 +19,7 @@ public class Aleatorio {
 
     public static int index = 0;
 
-    public static ArrayList<Double> arrayTest = new ArrayList<Double> (Arrays.asList(0.9921, 0.0004, 0.5534, 0.2761, 0.3398, 0.8963, 0.9023, 0.0132,
+    public static ArrayList<Double> arrayTest = new ArrayList<Double>(Arrays.asList(0.9921, 0.0004, 0.5534, 0.2761, 0.3398, 0.8963, 0.9023, 0.0132,
             0.4569, 0.5121, 0.9208, 0.0171, 0.2299, 0.8545, 0.06001, 0.6001, 0.2921));
 
     public Aleatorio() {
@@ -56,5 +56,8 @@ public class Aleatorio {
         ultimoAleatorio = ((a * ultimoAleatorio + c) % mod) / mod;
         qtAleatorios++;
         return ultimoAleatorio;
+//
+//        qtAleatorios++;
+//        return arrayTest.get(index++);
     }
 }

@@ -7,7 +7,7 @@ Evento {
     public Fila fila;
     public Fila destino;
 
-    public Evento(TipoEnum tipo, double tempo, Fila fila, Fila destino){
+    public Evento(TipoEnum tipo, double tempo, Fila fila){
         this.tipo = tipo;
         this.tempo = tempo;
         this.fila = fila;
@@ -15,7 +15,7 @@ Evento {
     }
 
     public enum TipoEnum {
-        CHEGADA, SAIDA;
+        CHEGADA, SAIDA, PASSAGEM;
     }
 
 }
