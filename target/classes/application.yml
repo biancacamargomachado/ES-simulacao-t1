@@ -1,27 +1,27 @@
-numeros-aleatorios: 100000
+numeros-aleatorios: 15
 
 filas:
   -
     id: 0
     servidores: 2
-    capacidade: 3
-    chegada-inicial: 2.5
+    capacidade: 4
+    chegada-inicial: 3.0
     chegada-minima: 2.0
     chegada-maxima: 3.0
-    saida-minima: 2.0
-    saida-maxima: 5.0
+    saida-minima: 4.0
+    saida-maxima: 7.0
   -
     id: 1
     servidores: 1
-    capacidade: 3
-    saida-minima: 3.0
-    saida-maxima: 5.0
+    capacidade: -1
+    saida-minima: 4.0
+    saida-maxima: 8.0
 
 redes:
   -
     origem: 0
     destino: 1
-    probabilidade: 1.0
+    probabilidade: 0.7
 
 
 
