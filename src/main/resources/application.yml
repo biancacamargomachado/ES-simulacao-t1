@@ -5,7 +5,7 @@ filas:
     id: 0
     servidores: 1
     capacidade: -1
-    chegada-inicial: 3.0
+    chegada-inicial: 1.0
     chegada-minima: 1.0
     chegada-maxima: 4.0
     saida-minima: 1.0
