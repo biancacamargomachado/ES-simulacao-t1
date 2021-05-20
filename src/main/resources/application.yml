@@ -1,27 +1,52 @@
-numeros-aleatorios: 15
+numeros-aleatorios: 99999
 
 filas:
   -
     id: 0
-    servidores: 2
-    capacidade: 4
-    chegada-inicial: 3.0
-    chegada-minima: 2.0
-    chegada-maxima: 3.0
-    saida-minima: 4.0
-    saida-maxima: 7.0
-  -
-    id: 1
     servidores: 1
     capacidade: -1
-    saida-minima: 4.0
-    saida-maxima: 8.0
+    chegada-inicial: 3.0
+    chegada-minima: 1.0
+    chegada-maxima: 4.0
+    saida-minima: 1.0
+    saida-maxima: 1.5
+  -
+    id: 1
+    servidores: 3
+    capacidade: 5
+    saida-minima: 5.0
+    saida-maxima: 10.0
+  -
+    id: 2
+    servidores: 2
+    capacidade: 8
+    saida-minima: 10.0
+    saida-maxima: 20.0
 
 redes:
   -
     origem: 0
     destino: 1
+    probabilidade: 0.8
+  -
+    origem: 0
+    destino: 2
+    probabilidade: 0.2
+  -
+    origem: 1
+    destino: 0
+    probabilidade: 0.3
+  -
+    origem: 1
+    destino: 2
+    probabilidade: 0.5
+  -
+    origem: 2
+    destino: 1
     probabilidade: 0.7
+
+
+
 
 
 

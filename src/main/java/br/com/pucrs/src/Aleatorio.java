@@ -23,11 +23,11 @@ public class Aleatorio {
             0.1211, 0.5131, 0.7208, 0.9172, 0.9922, 0.8324, 0.5011, 0.2931));
 
     public static double geraProximoAleatorio() {
-//        quantidadeAleatoriosGerados++;
-//        ultimoAleatorio = ((a * ultimoAleatorio + c) % mod) / mod;
-//        return ultimoAleatorio;
+        quantidadeAleatoriosGerados++;
+        ultimoAleatorio = ((a * ultimoAleatorio + c) % mod) / mod;
+        return ultimoAleatorio;
 
-        return arrayTest.get(quantidadeAleatoriosGerados++); //*/
+//        return arrayTest.get(quantidadeAleatoriosGerados++); //*/
 
     }
 }

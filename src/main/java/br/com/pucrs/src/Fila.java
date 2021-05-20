@@ -23,4 +23,12 @@ public class Fila {
 
     public Fila() {
     }
+
+    @Override
+    public String toString() {
+        return "Fila{" +
+                "id=" + id +
+                ", populacaoAtual=" + populacaoAtual +
+                '}';
+    }
 }
