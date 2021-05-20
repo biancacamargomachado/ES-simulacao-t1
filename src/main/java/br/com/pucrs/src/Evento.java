@@ -3,7 +3,7 @@ package br.com.pucrs.src;
 public class
 Evento {
     public TipoEnum tipo;
-    public double tempo; //Tempo do evento
+    public double tempo; // Tempo do evento
     public Integer idFila;
     public Integer idDestino;
 
@@ -14,7 +14,7 @@ Evento {
         this.idFila = idFila;
     }
     public enum TipoEnum {
-        CHEGADA, SAIDA_1, SAIDA_2, PASSAGEM;
+        CHEGADA, SAIDA_1, /** SAIDA_2, */ PASSAGEM;
     }
 
     public void setIdDestino(Integer idDestino) {

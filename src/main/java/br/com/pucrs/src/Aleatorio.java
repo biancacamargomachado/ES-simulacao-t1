@@ -27,7 +27,6 @@ public class Aleatorio {
         ultimoAleatorio = ((a * ultimoAleatorio + c) % mod) / mod;
         return ultimoAleatorio;
 
-//        return arrayTest.get(quantidadeAleatoriosGerados++); //*/
-
+        //return arrayTest.get(quantidadeAleatoriosGerados++);
     }
 }

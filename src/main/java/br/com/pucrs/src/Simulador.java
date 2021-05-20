@@ -55,12 +55,12 @@ public class Simulador {
             }
         }
 
-        //Exibe o resultado final
+        // exibe o resultado final
         this.exibirProbabilidade();
     }
 
     private void chegada(Fila fila) {
-//        System.out.printf("(%02d) %s | %.2f \n", EVENT_NUMBER++, CHEGADA, tempo);
+        //System.out.printf("(%02d) %s | %.2f \n", EVENT_NUMBER++, CHEGADA, tempo);
         contabilizaTempo();
 
         if (fila.capacidade == -1 || fila.populacaoAtual < fila.capacidade) {
@@ -80,7 +80,7 @@ public class Simulador {
     }
 
     private void passagem(Fila origem) {
-//        System.out.printf("(%02d) %s   | %.2f \n", EVENT_NUMBER++, PASSAGEM, tempo);
+        //System.out.printf("(%02d) %s   | %.2f \n", EVENT_NUMBER++, PASSAGEM, tempo);
         contabilizaTempo();
 
         origem.populacaoAtual--;
@@ -112,8 +112,7 @@ public class Simulador {
     }
 
     private void saida_1(Fila fila) { /** saida para rua durante passagem */
-//        System.out.printf("(%02d) %s   | %.2f \n", EVENT_NUMBER++, SAIDA_1, tempo);
-
+        //System.out.printf("(%02d) %s   | %.2f \n", EVENT_NUMBER++, SAIDA_1, tempo);
         contabilizaTempo();
 
         fila.populacaoAtual--;
@@ -129,7 +128,7 @@ public class Simulador {
 
     // Comentado pois no model odo professor não haverá uma saida direto para rua, sempre ha a possibilidade de ir para uma outra fila
 //    private void saida_2(Fila fila) { /** saida direto para rua */
-////        System.out.printf("(%02d) %s   | %.2f \n", EVENT_NUMBER++, SAIDA_2, tempo);
+//        System.out.printf("(%02d) %s   | %.2f \n", EVENT_NUMBER++, SAIDA_2, tempo);
 //        contabilizaTempo();
 //        fila.populacaoAtual--;
 //
@@ -155,7 +154,7 @@ public class Simulador {
         double tempoRealSaida = tempoSaida + tempo;
 
         Evento evento = new Evento(PASSAGEM, tempoRealSaida, fila.id);
-//      evento.setIdDestino(destino.id);
+        //evento.setIdDestino(destino.id);
 
         agendamentos.add(evento);
         agendamentos.sort(Comparator.comparingDouble(event -> event.tempo));
@@ -163,7 +162,7 @@ public class Simulador {
         //System.out.println("AGENDADO |" + novaSaida.tipo + " | " + tempoRealSaida);
     }
 
-    public void agendaSaida(Fila filaAtual, TipoEnum tipo) { // PASSA O TIPO DO ENUM CASO FOR NECESSARIO USAR O SAIDA_2
+    public void agendaSaida(Fila filaAtual, TipoEnum tipo) { // passa o tipo do enum caso seja necessario usar o saida_2
         double tempoSaida = (filaAtual.saidaMaxima - filaAtual.saidaMinima) * geraProximoAleatorio() + filaAtual.saidaMinima;
         double tempoRealSaida = tempoSaida + tempo;
 
@@ -176,11 +175,10 @@ public class Simulador {
     }
 
     public Fila sorteio(final Fila origem) {
-
         double intervalo = 0.0;
         final double aleatorio = geraProximoAleatorio();
 
-        //faz o sort do hahmap da menor probabilidade para a maior, afim de calcular o intervalo
+        // faz o sort do hahmap da menor probabilidade para a maior, afim de calcular o intervalo
         Map<Integer, Double> sortedMap = origem.probabilidades.entrySet().stream()
                 .sorted(Comparator.comparingDouble(e -> e.getValue()))
                 .collect(Collectors.toMap(
@@ -198,20 +196,19 @@ public class Simulador {
             intervalo += sortedMap.get(fila);
             if (aleatorio <= intervalo) { // se o numero aleatorio for menor que o do intervalo
                 filaDestino = escalonador.filas.get(fila); // adiciona a fila destino
-                break; //para iteração, pois ja achou o resultado
+                break; // para iteração, pois ja achou o resultado
             }
         }
-//        System.out.println("Fila " + origem.id + " -> Fila " + filaDestino.id);
+        //System.out.println("Fila " + origem.id + " -> Fila " + filaDestino.id);
         return filaDestino;
     }
 
     public Fila sorteioSemConsumirAleatorio(final Fila origem) {
-
         double intervalo = 0.0;
         Random random = new Random();
         final double aleatorio = random.nextDouble() * 1.0;
 
-        //faz o sort do hahmap da menor probabilidade para a maior, afim de calcular o intervalo
+        // faz o sort do hahmap da menor probabilidade para a maior, afim de calcular o intervalo
         Map<Integer, Double> sortedMap = origem.probabilidades.entrySet().stream()
                 .sorted(Comparator.comparingDouble(e -> e.getValue()))
                 .collect(Collectors.toMap(
@@ -229,10 +226,11 @@ public class Simulador {
             intervalo += sortedMap.get(fila);
             if (aleatorio <= intervalo) { // se o numero aleatorio for menor que o do intervalo
                 filaDestino = escalonador.filas.get(fila); // adiciona a fila destino
-                break; //para iteração, pois ja achou o resultado
+                break; // para iteração, pois ja achou o resultado
             }
         }
-///        System.out.println("Fila " + origem.id + " -> Fila " + filaDestino.id);
+
+        //System.out.println("Fila " + origem.id + " -> Fila " + filaDestino.id);
         return filaDestino;
     }
 
@@ -275,7 +273,7 @@ public class Simulador {
 
         List<HashMap<String, Object>> dadosFilas = (List<HashMap<String, Object>>) dados.get("filas");
 
-        //Mapeia do .yml para uma instancia de Fila a representacao dos dados contidos no arquivo
+        // mapeia do .yml para uma instancia de Fila a representacao dos dados contidos no arquivo
         List<Fila> filas = dadosFilas.stream().map(fila -> {
             Fila novaFila = new Fila();
             novaFila.id = (int) fila.get("id");
@@ -314,13 +312,9 @@ public class Simulador {
         escalonador.filas.addAll(filas); //Adiciona todas filas no escalonador
         escalonador.filas.remove(0); //Remove o primeiro item, que é vazio
 
-        //Adiciona probabilidade % de chance de a fila estar com x pessoas em seu k de multiplas filas
+        // adiciona probabilidade % de chance de a fila estar com x pessoas em seu k de multiplas filas
         escalonador.filas.forEach(f -> {
-            /**
-             *
-             * ALTERAR O ULTIMO VALOR DA LINHA DO FINAL DESSE FOREACH CASO ESTOURE NULLPOINTEREXCEPTION
-             *
-             * */
+            /** ALTERAR O ULTIMO VALOR DA LINHA DO FINAL DESSE FOREACH CASO ESTOURE NULLPOINTEREXCEPTION */
             probabilidades.put(f.id, new double[f.capacidade != -1 ? f.capacidade + 1 : 5]); /** ALTERAR O VALOR APOS O : */
         });
 
@@ -329,4 +323,3 @@ public class Simulador {
         agendamentos.add(primeiroEvento);
     }
 }
-
