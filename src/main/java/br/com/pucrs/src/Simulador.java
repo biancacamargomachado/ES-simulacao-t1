@@ -36,71 +36,75 @@ public class Simulador {
             tempo = eventoAtual.tempo;
 
             //Buscar pelo id no escalonador
-            Fila filaAtual = escalonador.filas.get(eventoAtual.idFila);
+            Fila filaAtual = escalonador.filas.get(eventoAtual.idOrigem);
+            Fila filaDestino = null;
+            if(eventoAtual.idDestino != null){
+                filaDestino = escalonador.filas.get(eventoAtual.idDestino);
+            }
 
             if (eventoAtual.tipo == CHEGADA) {
                 chegada(filaAtual);
-            }
-
-            if (eventoAtual.tipo == SAIDA_1) {
+            }else if (eventoAtual.tipo == SAIDA_1) {
                 saida_1(filaAtual);
+            }else if (eventoAtual.tipo == PASSAGEM) {
+                passagem(filaAtual, filaDestino);
             }
 
 //            if (eventoAtual.tipo == SAIDA_2) {
 //                saida_2(filaAtual);
 //            }
 
-            if (eventoAtual.tipo == PASSAGEM) {
-                passagem(filaAtual);
-            }
         }
 
         // exibe o resultado final
         this.exibirProbabilidade();
     }
 
-    private void chegada(Fila fila) {
+    private void chegada(Fila origem) {
         //System.out.printf("(%02d) %s | %.2f \n", EVENT_NUMBER++, CHEGADA, tempo);
         contabilizaTempo();
 
-        if (fila.capacidade == -1 || fila.populacaoAtual < fila.capacidade) {
-            fila.populacaoAtual++;
-            if (fila.populacaoAtual <= fila.servidores) {
-                if (sorteio(fila) != null) { // se for para outra fila
-                    agendaPassagem(fila);
+        if (origem.capacidade == -1 || origem.populacaoAtual < origem.capacidade) {
+            origem.populacaoAtual++;
+            if (origem.populacaoAtual <= origem.servidores) {
+                Fila destino = sorteio(origem);
+                if (destino!= null) { // se for para outra fila
+                    agendaPassagem(origem, destino);
                 } else {
-                    agendaSaida(fila, SAIDA_1);
+                    agendaSaida(origem, SAIDA_1);
                 }
             }
         } else {
-            fila.perdidos++;
+            origem.perdidos++; //?
         }
 
-        agendaChegada(fila);
+        agendaChegada(origem);
     }
 
-    private void passagem(Fila origem) {
+    private void passagem(Fila origem, Fila destino) {
         //System.out.printf("(%02d) %s   | %.2f \n", EVENT_NUMBER++, PASSAGEM, tempo);
         contabilizaTempo();
 
         origem.populacaoAtual--;
 
         if (origem.populacaoAtual >= origem.servidores) {
-            if (sorteio(origem) != null) {
-                agendaPassagem(origem);
+            Fila destinoProxFilaOrigem = sorteio(origem);
+            if (destinoProxFilaOrigem != null) {
+                agendaPassagem(origem, destinoProxFilaOrigem);
             } else {
                 agendaSaida(origem, SAIDA_1);
             }
         }
 
-        Fila destino = sorteioSemConsumirAleatorio(origem);
+        //Fila destino = sorteioSemConsumirAleatorio(origem);
 
         if (destino != null) {
             if (destino.capacidade == -1 || destino.populacaoAtual < destino.capacidade) {
                 destino.populacaoAtual++;
                 if (destino.populacaoAtual <= destino.servidores) {
-                    if (sorteio(destino) != null) { // se for para outra fila
-                        agendaPassagem(destino);
+                    Fila destino2 = sorteio(destino);
+                    if (destino2 != null) { // se for para outra fila
+                        agendaPassagem(destino, destino2);
                     } else {
                         agendaSaida(destino, SAIDA_1);
                     }
@@ -111,17 +115,18 @@ public class Simulador {
         }
     }
 
-    private void saida_1(Fila fila) { /** saida para rua durante passagem */
+    private void saida_1(Fila origem) { /** saida para rua durante passagem */
         //System.out.printf("(%02d) %s   | %.2f \n", EVENT_NUMBER++, SAIDA_1, tempo);
         contabilizaTempo();
 
-        fila.populacaoAtual--;
+        origem.populacaoAtual--;
 
-        if (fila.populacaoAtual >= fila.servidores) {
-            if (sorteio(fila) != null) {
-                agendaPassagem(fila);
+        if (origem.populacaoAtual >= origem.servidores) {
+            Fila destino = sorteio(origem);
+            if (destino != null) {
+                agendaPassagem(origem, destino);
             } else {
-                agendaSaida(fila, SAIDA_1);
+                agendaSaida(origem, SAIDA_1);
             }
         }
     }
@@ -141,7 +146,7 @@ public class Simulador {
         double tempoChegada = (fila.chegadaMaxima - fila.chegadaMinima) * (geraProximoAleatorio() + fila.chegadaMinima);
         double tempoRealChegada = tempoChegada + tempo;
 
-        Evento evento = new Evento(CHEGADA, tempoRealChegada, fila.id);
+        Evento evento = new Evento(CHEGADA, tempoRealChegada, fila.id, null);
 
         agendamentos.add(evento);
         agendamentos.sort(Comparator.comparingDouble(event -> event.tempo));
@@ -149,11 +154,11 @@ public class Simulador {
         //System.out.println("AGENDADO |" + novaChegada.tipo + " | " + tempoRealChegada);
     }
 
-    public void agendaPassagem(Fila fila) {
-        double tempoSaida = (fila.saidaMaxima - fila.saidaMinima) * geraProximoAleatorio() + fila.saidaMinima;
+    public void agendaPassagem(Fila origem, Fila destino) {
+        double tempoSaida = (origem.saidaMaxima - origem.saidaMinima) * geraProximoAleatorio() + origem.saidaMinima;
         double tempoRealSaida = tempoSaida + tempo;
 
-        Evento evento = new Evento(PASSAGEM, tempoRealSaida, fila.id);
+        Evento evento = new Evento(PASSAGEM, tempoRealSaida, origem.id, destino.id);
         //evento.setIdDestino(destino.id);
 
         agendamentos.add(evento);
@@ -162,11 +167,11 @@ public class Simulador {
         //System.out.println("AGENDADO |" + novaSaida.tipo + " | " + tempoRealSaida);
     }
 
-    public void agendaSaida(Fila filaAtual, TipoEnum tipo) { // passa o tipo do enum caso seja necessario usar o saida_2
-        double tempoSaida = (filaAtual.saidaMaxima - filaAtual.saidaMinima) * geraProximoAleatorio() + filaAtual.saidaMinima;
+    public void agendaSaida(Fila filaOrigem, TipoEnum tipo) { // passa o tipo do enum caso seja necessario usar o saida_2
+        double tempoSaida = (filaOrigem.saidaMaxima - filaOrigem.saidaMinima) * geraProximoAleatorio() + filaOrigem.saidaMinima;
         double tempoRealSaida = tempoSaida + tempo;
 
-        Evento evento = new Evento(tipo, tempoRealSaida, filaAtual.id);
+        Evento evento = new Evento(tipo, tempoRealSaida, filaOrigem.id, null);
 
         agendamentos.add(evento);
         agendamentos.sort(Comparator.comparingDouble(event -> event.tempo));
@@ -319,7 +324,7 @@ public class Simulador {
         });
 
         //Agenda o primeiro evento
-        Evento primeiroEvento = new Evento(CHEGADA, escalonador.filas.get(0).chegadaInicial, escalonador.filas.get(0).id); // pega a primeira fila
+        Evento primeiroEvento = new Evento(CHEGADA, escalonador.filas.get(0).chegadaInicial, escalonador.filas.get(0).id, null); // pega a primeira fila
         agendamentos.add(primeiroEvento);
     }
 }

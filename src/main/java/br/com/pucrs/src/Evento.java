@@ -4,14 +4,14 @@ public class
 Evento {
     public TipoEnum tipo;
     public double tempo; // Tempo do evento
-    public Integer idFila;
+    public Integer idOrigem;
     public Integer idDestino;
 
-
-    public Evento(TipoEnum tipo, double tempo, Integer idFila) {
+    public Evento(TipoEnum tipo, double tempo, Integer idOrigem, Integer idDestino) {
         this.tipo = tipo;
         this.tempo = tempo;
-        this.idFila = idFila;
+        this.idOrigem = idOrigem;
+        this.idDestino = idDestino;
     }
     public enum TipoEnum {
         CHEGADA, SAIDA_1, /** SAIDA_2, */ PASSAGEM;
