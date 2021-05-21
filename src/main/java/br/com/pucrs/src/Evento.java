@@ -7,11 +7,11 @@ Evento {
     public Integer idFila;
     public Integer idDestino;
 
-
     public Evento(TipoEnum tipo, double tempo, Integer idFila) {
         this.tipo = tipo;
         this.tempo = tempo;
         this.idFila = idFila;
+        this.idDestino = idDestino;
     }
     public enum TipoEnum {
         CHEGADA, SAIDA_1, /** SAIDA_2, */ PASSAGEM;

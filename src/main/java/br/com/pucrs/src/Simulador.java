@@ -37,6 +37,7 @@ public class Simulador {
 
             //Buscar pelo id no escalonador
             Fila filaAtual = escalonador.filas.get(eventoAtual.idFila);
+            Fila destino = eventoAtual.idDestino == null ? null : escalonador.filas.get(eventoAtual.idDestino);
 
             if (eventoAtual.tipo == CHEGADA) {
                 chegada(filaAtual);
@@ -51,7 +52,7 @@ public class Simulador {
 //            }
 
             if (eventoAtual.tipo == PASSAGEM) {
-                passagem(filaAtual);
+                passagem(filaAtual, destino);
             }
         }
 
@@ -59,55 +60,47 @@ public class Simulador {
         this.exibirProbabilidade();
     }
 
-    private void chegada(Fila fila) {
+    private void chegada(Fila atual) {
         //System.out.printf("(%02d) %s | %.2f \n", EVENT_NUMBER++, CHEGADA, tempo);
         contabilizaTempo();
 
-        if (fila.capacidade == -1 || fila.populacaoAtual < fila.capacidade) {
-            fila.populacaoAtual++;
-            if (fila.populacaoAtual <= fila.servidores) {
-                if (sorteio(fila) != null) { // se for para outra fila
-                    agendaPassagem(fila);
+        if (atual.capacidade == -1 || atual.populacaoAtual < atual.capacidade) {
+            atual.populacaoAtual++;
+            if (atual.populacaoAtual <= atual.servidores) {
+                Fila destino = sorteio(atual);
+                if (destino != null) { // se for para outra fila
+                    agendaPassagem(atual, destino);
                 } else {
-                    agendaSaida(fila, SAIDA_1);
+                    agendaSaida(atual, SAIDA_1);
                 }
             }
         } else {
-            fila.perdidos++;
+            atual.perdidos++;
         }
 
-        agendaChegada(fila);
+        agendaChegada(atual);
     }
 
-    private void passagem(Fila origem) {
+    private void passagem(Fila origem, Fila destino) {
         //System.out.printf("(%02d) %s   | %.2f \n", EVENT_NUMBER++, PASSAGEM, tempo);
         contabilizaTempo();
 
         origem.populacaoAtual--;
 
         if (origem.populacaoAtual >= origem.servidores) {
-            if (sorteio(origem) != null) {
-                agendaPassagem(origem);
+            if (destino!= null) {
+                agendaPassagem(origem, destino);
             } else {
                 agendaSaida(origem, SAIDA_1);
             }
         }
-
-        Fila destino = sorteioSemConsumirAleatorio(origem);
-
-        if (destino != null) {
-            if (destino.capacidade == -1 || destino.populacaoAtual < destino.capacidade) {
-                destino.populacaoAtual++;
-                if (destino.populacaoAtual <= destino.servidores) {
-                    if (sorteio(destino) != null) { // se for para outra fila
-                        agendaPassagem(destino);
-                    } else {
-                        agendaSaida(destino, SAIDA_1);
-                    }
-                }
-            } else {
-                destino.perdidos++;
+        if (destino.capacidade == -1 || destino.populacaoAtual < destino.capacidade) {
+            destino.populacaoAtual++;
+            if (destino.populacaoAtual <= destino.servidores) {
+                agendaSaida(destino, SAIDA_1);
             }
+        } else {
+            destino.perdidos++;
         }
     }
 
@@ -118,8 +111,9 @@ public class Simulador {
         fila.populacaoAtual--;
 
         if (fila.populacaoAtual >= fila.servidores) {
-            if (sorteio(fila) != null) {
-                agendaPassagem(fila);
+            Fila destino = sorteio(fila);
+            if (destino != null) {
+                agendaPassagem(fila, destino);
             } else {
                 agendaSaida(fila, SAIDA_1);
             }
@@ -137,11 +131,11 @@ public class Simulador {
 //        }
 //    }
 
-    public void agendaChegada(Fila fila) {
-        double tempoChegada = (fila.chegadaMaxima - fila.chegadaMinima) * (geraProximoAleatorio() + fila.chegadaMinima);
+    public void agendaChegada(Fila origem) {
+        double tempoChegada = (origem.chegadaMaxima - origem.chegadaMinima) * (geraProximoAleatorio() + origem.chegadaMinima);
         double tempoRealChegada = tempoChegada + tempo;
 
-        Evento evento = new Evento(CHEGADA, tempoRealChegada, fila.id);
+        Evento evento = new Evento(CHEGADA, tempoRealChegada, origem.id);
 
         agendamentos.add(evento);
         agendamentos.sort(Comparator.comparingDouble(event -> event.tempo));
@@ -149,12 +143,12 @@ public class Simulador {
         //System.out.println("AGENDADO |" + novaChegada.tipo + " | " + tempoRealChegada);
     }
 
-    public void agendaPassagem(Fila fila) {
-        double tempoSaida = (fila.saidaMaxima - fila.saidaMinima) * geraProximoAleatorio() + fila.saidaMinima;
+    public void agendaPassagem(Fila origem, Fila destino) {
+        double tempoSaida = (origem.saidaMaxima - origem.saidaMinima) * geraProximoAleatorio() + origem.saidaMinima;
         double tempoRealSaida = tempoSaida + tempo;
 
-        Evento evento = new Evento(PASSAGEM, tempoRealSaida, fila.id);
-        //evento.setIdDestino(destino.id);
+        Evento evento = new Evento(PASSAGEM, tempoRealSaida, origem.id);
+        evento.setIdDestino(destino.id);
 
         agendamentos.add(evento);
         agendamentos.sort(Comparator.comparingDouble(event -> event.tempo));
