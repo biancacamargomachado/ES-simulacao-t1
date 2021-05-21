@@ -37,6 +37,7 @@ public class Simulador {
 
             //Buscar pelo id no escalonador
             Fila filaAtual = escalonador.filas.get(eventoAtual.idFila);
+            Fila destino = eventoAtual.idDestino != null ? escalonador.filas.get(eventoAtual.idDestino) : null;
 
             if (eventoAtual.tipo == CHEGADA) {
                 chegada(filaAtual);
@@ -51,7 +52,7 @@ public class Simulador {
             }
 
             if (eventoAtual.tipo == PASSAGEM) {
-                passagem(filaAtual);
+                passagem(filaAtual, destino);
             }
         }
 
@@ -66,8 +67,9 @@ public class Simulador {
         if (fila.capacidade == -1 || fila.populacaoAtual < fila.capacidade) {
             fila.populacaoAtual++;
             if (fila.populacaoAtual <= fila.servidores) {
-                if (sorteio(fila) != null) { // se for para outra fila
-                    agendaPassagem(fila);
+                Fila destino = sorteio(fila);
+                if (destino != null) { // se for para outra fila
+                    agendaPassagem(fila, destino);
                 } else {
                     agendaSaida(fila, SAIDA_1);
                 }
@@ -79,21 +81,20 @@ public class Simulador {
         agendaChegada(fila);
     }
 
-    private void passagem(Fila origem) {
+    private void passagem(Fila origem, Fila destino) {
         System.out.printf("(%02d) %s   | %.2f \n", EVENT_NUMBER++, PASSAGEM, tempo);
         contabilizaTempo();
 
         origem.populacaoAtual--;
 
         if (origem.populacaoAtual >= origem.servidores) {
-            if (sorteio(origem) != null) {
-                agendaPassagem(origem);
+            Fila fila = sorteio(origem);
+            if (fila != null) {
+                agendaPassagem(origem, fila);
             } else {
                 agendaSaida(origem, SAIDA_1);
             }
         }
-
-        Fila destino = sorteioSemConsumirAleatorio(origem);
 
         if (destino != null) {
             destino.populacaoAtual++;
@@ -111,8 +112,9 @@ public class Simulador {
         fila.populacaoAtual--;
 
         if (fila.populacaoAtual >= fila.servidores) {
-            if (sorteio(fila) != null) {
-                agendaPassagem(fila);
+            Fila destino = sorteio(fila);
+            if (destino != null) {
+                agendaPassagem(fila, destino);
             } else {
                 agendaSaida(fila, SAIDA_1);
             }
@@ -142,12 +144,12 @@ public class Simulador {
         //System.out.println("AGENDADO |" + novaChegada.tipo + " | " + tempoRealChegada);
     }
 
-    public void agendaPassagem(Fila fila) {
+    public void agendaPassagem(Fila fila, Fila destino) {
         double tempoSaida = (fila.saidaMaxima - fila.saidaMinima) * geraProximoAleatorio() + fila.saidaMinima;
         double tempoRealSaida = tempoSaida + tempo;
 
         Evento evento = new Evento(PASSAGEM, tempoRealSaida, fila.id);
-//      evento.setIdDestino(destino.id);
+        evento.setIdDestino(destino.id);
 
         agendamentos.add(evento);
         agendamentos.sort(Comparator.comparingDouble(event -> event.tempo));
@@ -241,7 +243,11 @@ public class Simulador {
         double porcentagem = 0;
 
         for (int id : probabilidades.keySet()) {
-            System.out.println("- FILA " + id);
+            Fila fila = escalonador.filas.get(id);
+            String identificacao = String.format("Fila %d - G/G/%d/%s", fila.id + 1, fila.servidores, (fila.capacidade == -1 ? "-" : fila.capacidade));
+            System.out.println("*******************************");
+            System.out.println(identificacao);
+            System.out.println("*******************************");
             for (double prob : probabilidades.get(id)) {
                 double result = ((prob * 1.0) / this.tempo) * 100;
 
@@ -249,7 +255,7 @@ public class Simulador {
                 System.out.println(print + "%");
                 porcentagem += result;
             }
-
+            System.out.println("*******************************");
             System.out.println("Total de clientes perdidos: " + escalonador.filas.get(id).perdidos);
             System.out.println("Soma das porcentagens: " + Math.round(porcentagem) + "%");
             System.out.println("Tempo total: " + tempo);
@@ -312,7 +318,7 @@ public class Simulador {
              * ALTERAR O ULTIMO VALOR DA LINHA DO FINAL DESSE FOREACH CASO ESTOURE NULLPOINTEREXCEPTION
              *
              * */
-            probabilidades.put(f.id, new double[f.capacidade != -1 ? f.capacidade + 1: 5]); /** ALTERAR O VALOR APOS O : */
+            probabilidades.put(f.id, new double[f.capacidade != -1 ? f.capacidade + 1 : 6]); /** ALTERAR O VALOR APOS O : */
         });
 
         //Agenda o primeiro evento
