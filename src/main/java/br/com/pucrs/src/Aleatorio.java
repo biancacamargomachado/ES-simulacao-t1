@@ -25,6 +25,7 @@ public class Aleatorio {
     public static double geraProximoAleatorio() {
         quantidadeAleatoriosGerados++;
         ultimoAleatorio = ((a * ultimoAleatorio + c) % mod) / mod;
+
         return ultimoAleatorio;
         // return arrayTest.get(quantidadeAleatoriosGerados++);
     }

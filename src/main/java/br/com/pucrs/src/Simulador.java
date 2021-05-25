@@ -50,10 +50,6 @@ public class Simulador {
                 passagem(filaAtual, filaDestino);
             }
 
-//            if (eventoAtual.tipo == SAIDA_2) {
-//                saida_2(filaAtual);
-//            }
-
         }
 
         // exibe o resultado final
@@ -61,10 +57,7 @@ public class Simulador {
     }
 
     private void chegada(Fila origem) {
-        //System.out.printf("(%02d) %s | %.2f \n", EVENT_NUMBER++, CHEGADA, tempo);
-        // exibirProbabilidade();
         contabilizaTempo();
-        // exibirProbabilidade();
 
         if (origem.capacidade == -1 || origem.populacaoAtual < origem.capacidade) {
             origem.populacaoAtual++;
@@ -77,17 +70,14 @@ public class Simulador {
                 }
             }
         } else {
-            origem.perdidos++; //?
+            origem.perdidos++;
         }
 
         agendaChegada(origem);
     }
 
     private void passagem(Fila origem, Fila destino) {
-        //System.out.printf("(%02d) %s   | %.2f \n", EVENT_NUMBER++, PASSAGEM, tempo);
-        // exibirProbabilidade();
         contabilizaTempo();
-        // exibirProbabilidade();
 
         origem.populacaoAtual--;
 
@@ -99,8 +89,6 @@ public class Simulador {
                 agendaSaida(origem, SAIDA_1);
             }
         }
-
-        //Fila destino = sorteioSemConsumirAleatorio(origem);
 
         if (destino != null) {
             if (destino.capacidade == -1 || destino.populacaoAtual < destino.capacidade) {
@@ -120,10 +108,7 @@ public class Simulador {
     }
 
     private void saida_1(Fila origem) { /** saida para rua durante passagem */
-        //System.out.printf("(%02d) %s   | %.2f \n", EVENT_NUMBER++, SAIDA_1, tempo);
-        // exibirProbabilidade();
         contabilizaTempo();
-        // exibirProbabilidade();
 
         origem.populacaoAtual--;
 
@@ -137,17 +122,6 @@ public class Simulador {
         }
     }
 
-    // Comentado pois no model odo professor não haverá uma saida direto para rua, sempre ha a possibilidade de ir para uma outra fila
-//    private void saida_2(Fila fila) { /** saida direto para rua */
-//        System.out.printf("(%02d) %s   | %.2f \n", EVENT_NUMBER++, SAIDA_2, tempo);
-//        contabilizaTempo();
-//        fila.populacaoAtual--;
-//
-//        if (fila.populacaoAtual >= fila.servidores) {
-//            agendaSaida(fila, SAIDA_2);
-//        }
-//    }
-
     public void agendaChegada(Fila fila) {
         double tempoChegada = (fila.chegadaMaxima - fila.chegadaMinima) * geraProximoAleatorio() + fila.chegadaMinima;
         double tempoRealChegada = tempoChegada + tempo;
@@ -156,8 +130,6 @@ public class Simulador {
 
         agendamentos.add(evento);
         agendamentos.sort(Comparator.comparingDouble(event -> event.tempo));
-
-        //System.out.println("AGENDADO |" + novaChegada.tipo + " | " + tempoRealChegada);
     }
 
     public void agendaPassagem(Fila origem, Fila destino) {
@@ -165,12 +137,9 @@ public class Simulador {
         double tempoRealSaida = tempoSaida + tempo;
 
         Evento evento = new Evento(PASSAGEM, tempoRealSaida, origem.id, destino.id);
-        //evento.setIdDestino(destino.id);
 
         agendamentos.add(evento);
         agendamentos.sort(Comparator.comparingDouble(event -> event.tempo));
-
-        //System.out.println("AGENDADO |" + novaSaida.tipo + " | " + tempoRealSaida);
     }
 
     public void agendaSaida(Fila filaOrigem, TipoEnum tipo) { // passa o tipo do enum caso seja necessario usar o saida_2
@@ -181,8 +150,6 @@ public class Simulador {
 
         agendamentos.add(evento);
         agendamentos.sort(Comparator.comparingDouble(event -> event.tempo));
-
-        //System.out.println("AGENDADO |" + novaSaida.tipo + " | " + tempoRealSaida);
     }
 
     public Fila sorteio(final Fila origem) {
@@ -210,7 +177,6 @@ public class Simulador {
                 break; // para iteração, pois ja achou o resultado
             }
         }
-        //System.out.println("Fila " + origem.id + " -> Fila " + filaDestino.id);
         return filaDestino;
     }
 
@@ -241,7 +207,6 @@ public class Simulador {
             }
         }
 
-        //System.out.println("Fila " + origem.id + " -> Fila " + filaDestino.id);
         return filaDestino;
     }
 
@@ -262,9 +227,10 @@ public class Simulador {
             for (double time : probabilidades.get(id)) {
                 double prob = (time / this.tempo) * 100;
 
-                // probabilidades.get(fila.id)[fila.populacaoAtual]
-                String print = String.format("(%d) %.2f (%.2f)", posicao++, prob, time);
-                System.out.println(print);
+                String print = String.format("(%d) %.2f", posicao++, prob);
+                String printTime = String.format("%.2f)", time);
+                System.out.print(print + "% ");
+                System.out.println("(Time: " + printTime);
                 porcentagem += prob;
             }
 
