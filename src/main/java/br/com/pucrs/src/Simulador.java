@@ -62,7 +62,9 @@ public class Simulador {
 
     private void chegada(Fila origem) {
         //System.out.printf("(%02d) %s | %.2f \n", EVENT_NUMBER++, CHEGADA, tempo);
+        // exibirProbabilidade();
         contabilizaTempo();
+        // exibirProbabilidade();
 
         if (origem.capacidade == -1 || origem.populacaoAtual < origem.capacidade) {
             origem.populacaoAtual++;
@@ -83,7 +85,9 @@ public class Simulador {
 
     private void passagem(Fila origem, Fila destino) {
         //System.out.printf("(%02d) %s   | %.2f \n", EVENT_NUMBER++, PASSAGEM, tempo);
+        // exibirProbabilidade();
         contabilizaTempo();
+        // exibirProbabilidade();
 
         origem.populacaoAtual--;
 
@@ -117,7 +121,9 @@ public class Simulador {
 
     private void saida_1(Fila origem) { /** saida para rua durante passagem */
         //System.out.printf("(%02d) %s   | %.2f \n", EVENT_NUMBER++, SAIDA_1, tempo);
+        // exibirProbabilidade();
         contabilizaTempo();
+        // exibirProbabilidade();
 
         origem.populacaoAtual--;
 
@@ -143,7 +149,7 @@ public class Simulador {
 //    }
 
     public void agendaChegada(Fila fila) {
-        double tempoChegada = (fila.chegadaMaxima - fila.chegadaMinima) * (geraProximoAleatorio() + fila.chegadaMinima);
+        double tempoChegada = (fila.chegadaMaxima - fila.chegadaMinima) * geraProximoAleatorio() + fila.chegadaMinima;
         double tempoRealChegada = tempoChegada + tempo;
 
         Evento evento = new Evento(CHEGADA, tempoRealChegada, fila.id, null);
@@ -253,12 +259,13 @@ public class Simulador {
 
         for (int id : probabilidades.keySet()) {
             System.out.println("- FILA " + id);
-            for (double prob : probabilidades.get(id)) {
-                double result = ((prob * 1.0) / this.tempo) * 100;
+            for (double time : probabilidades.get(id)) {
+                double prob = (time / this.tempo) * 100;
 
-                String print = String.format("(%d) Value %.2f", posicao++, result);
-                System.out.println(print + "%");
-                porcentagem += result;
+                // probabilidades.get(fila.id)[fila.populacaoAtual]
+                String print = String.format("(%d) %.2f (%.2f)", posicao++, prob, time);
+                System.out.println(print);
+                porcentagem += prob;
             }
 
             System.out.println("Total de clientes perdidos: " + escalonador.filas.get(id).perdidos);
@@ -320,7 +327,7 @@ public class Simulador {
         // adiciona probabilidade % de chance de a fila estar com x pessoas em seu k de multiplas filas
         escalonador.filas.forEach(f -> {
             /** ALTERAR O ULTIMO VALOR DA LINHA DO FINAL DESSE FOREACH CASO ESTOURE NULLPOINTEREXCEPTION */
-            probabilidades.put(f.id, new double[f.capacidade != -1 ? f.capacidade + 1 : 5]); /** ALTERAR O VALOR APOS O : */
+            probabilidades.put(f.id, new double[f.capacidade != -1 ? f.capacidade + 1 : 10]); /** ALTERAR O VALOR APOS O : */
         });
 
         //Agenda o primeiro evento
