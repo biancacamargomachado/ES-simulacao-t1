@@ -12,8 +12,6 @@ public class Main {
         Simulador simulador = new Simulador();
         simulador.mapearYamlParaPOJO();
 
-        Aleatorio aleatorios = new Aleatorio(simulador.qtdNumerosAleatorios);
-
-        simulador.simulacao(aleatorios);
+        simulador.simulacao();
     }
 }

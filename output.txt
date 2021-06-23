@@ -1,0 +1,35 @@
+EVENTO       | TEMPO
+**********
+- FILA 0
+(0) Value 63.37%
+(1) Value 33.76%
+(2) Value 2.80%
+(3) Value 0.08%
+(4) Value 0.00%
+Total de clientes perdidos: 0
+Soma das porcentagens: 100%
+Tempo total: 60133.50437204671
+- FILA 1
+(0) Value 2.91%
+(1) Value 18.15%
+(2) Value 33.33%
+(3) Value 28.56%
+(4) Value 13.64%
+(5) Value 3.42%
+Total de clientes perdidos: 272
+Soma das porcentagens: 100%
+Tempo total: 60133.50437204671
+- FILA 2
+(0) Value 0.02%
+(1) Value 0.11%
+(2) Value 0.54%
+(3) Value 1.53%
+(4) Value 3.36%
+(5) Value 7.70%
+(6) Value 22.66%
+(7) Value 34.72%
+(8) Value 29.35%
+Total de clientes perdidos: 2493
+Soma das porcentagens: 100%
+Tempo total: 60133.50437204671
+**********

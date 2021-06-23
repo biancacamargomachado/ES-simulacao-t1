@@ -1,52 +1,32 @@
 package br.com.pucrs.src;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Random;
+
 public class Aleatorio {
     /**
      * c = constante usada para maior variação dos números gerados
      * a = número
      * mod = número grande
      */
-    public int a;
-    public int c;
-    public double mod;
-    public int semente;
-    public int size;
-    public double ultimoAleatorio;
-    public double qtAleatorios;
+    public static long a = 25214903917L;
+    public static long c = 44848151548451L;
+    public static double mod = Math.pow(2.0, 24) - 8;
+    public static int semente = 7;
+    public static double ultimoAleatorio = semente;
+    public static int quantidadeAleatoriosGerados = 0;
 
-    public Aleatorio(int size) {
-        this.a = 54564;
-        this.c = 31;
-        this.mod = Math.pow(2,39)-5;
-        this.semente = 7;
-        this.size = size;
-        this.ultimoAleatorio = semente;
-        this.qtAleatorios = 0;
-    }
+    public static int index = 0;
 
-    /* Método para testar com outros aleatórios
-    public Aleatorio(int size, double[] numerosAleatorios) {
-        this.a = 54564;
-        this.c = 31;
-        this.mod = Math.pow(2,39)-5;
-        this.semente = 7;
-        this.size = size;
-        this.numerosAleatorios = numerosAleatorios;
-    } */
+    public static ArrayList<Double> arrayTest = new ArrayList<Double>(Arrays.asList(0.2176, 0.0103, 0.1109, 0.3456, 0.9910, 0.2323, 0.9211, 0.0322,
+            0.1211, 0.5131, 0.7208, 0.9172, 0.9922, 0.8324, 0.5011, 0.2931, 0.2932));
 
-    /*
-    public void geraPseudoAleatorio(){
-        numerosAleatorios = new double[size];
-        numerosAleatorios[0] = semente;
-        for(int i = 1; i<size; i++){
-            numerosAleatorios[i] = ((a*numerosAleatorios[i-1] + c) % mod);
-        }
-    }
-     */
+    public static double geraProximoAleatorio() {
+        quantidadeAleatoriosGerados++;
+        ultimoAleatorio = ((a * ultimoAleatorio + c) % mod) / mod;
 
-    public double geraProximoAleatorio(){
-        ultimoAleatorio = ((a*ultimoAleatorio + c) % mod)/mod;
-        qtAleatorios++;
         return ultimoAleatorio;
+        // return arrayTest.get(quantidadeAleatoriosGerados++);
     }
 }

@@ -6,8 +6,8 @@ import java.util.List;
 public class EscalonadorDeFilas {
     public List<Fila> filas;
 
-    public EscalonadorDeFilas(){
-        filas = new ArrayList<Fila>();
+    public EscalonadorDeFilas() {
+        filas = new ArrayList<>();
         filas.add(new Fila());
     }
 }

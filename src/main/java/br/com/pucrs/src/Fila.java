@@ -21,6 +21,13 @@ public class Fila {
     public HashMap<Integer, Fila> filaDestino = new HashMap<>();
     public HashMap<Integer, Double> probabilidades = new HashMap<>();
 
-    public Fila() {
+    public Fila() {}
+
+    @Override
+    public String toString() {
+        return "Fila{" +
+                "id=" + id +
+                ", populacaoAtual=" + populacaoAtual +
+                '}';
     }
 }
